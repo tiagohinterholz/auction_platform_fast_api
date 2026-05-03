@@ -1,0 +1,20 @@
+# Ambientes Virtuais (criados pelo uv ou venv)
+.venv/
+venv/
+env/
+
+# Arquivos de Cache do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variáveis de Ambiente e Logs
+.env
+*.log
+
+# Caches de Ferramentas e Testes
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.local.md

@@ -1,0 +1,19 @@
+[project]
+name = "auction-platform-fast-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.18.4",
+    "asyncpg>=0.31.0",
+    "celery>=5.6.3",
+    "fastapi>=0.136.1",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic>=2.13.3",
+    "pydantic-settings>=2.14.0",
+    "pyjwt>=2.12.1",
+    "redis>=7.4.0",
+    "sqlalchemy>=2.0.49",
+    "uvicorn>=0.46.0",
+]

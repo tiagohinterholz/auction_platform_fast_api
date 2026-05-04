@@ -30,10 +30,10 @@ class Auction:
         description: str,
         start_price: float,
         minimun_increment: float,
-        start_time: datetime,
-        end_time: datetime,
         status: AuctionStatus,
         images: list[str],
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
     ):
         self._id = id
         self._user_id = user_id
@@ -56,8 +56,6 @@ class Auction:
         description: str,
         start_price: float,
         minimun_increment: float,
-        start_time: datetime,
-        end_time: datetime,
         status: AuctionStatus,
         images: list[str] | None = None,
     ) -> "Auction":
@@ -69,8 +67,6 @@ class Auction:
             raise InvalidAuctionStartPriceException(start_price)
         if minimun_increment <= 0:
             raise InvalidAuctionMinimunIncrementException(minimun_increment)
-        if start_time >= end_time:
-            raise InvalidAuctionStartTimeException(start_time)
         if status not in AuctionStatus:
             raise InvalidAuctionStatusException(status)
 
@@ -83,8 +79,6 @@ class Auction:
             description=description,
             start_price=start_price,
             minimun_increment=minimun_increment,
-            start_time=start_time,
-            end_time=end_time,
             status=status,
             images=safe_images,
         )
@@ -97,8 +91,6 @@ class Auction:
                     "description": auction.description,
                     "start_price": str(auction.start_price),
                     "minimun_increment": str(auction.minimun_increment),
-                    "start_time": auction.start_time.isoformat(),
-                    "end_time": auction.end_time.isoformat(),
                     "status": auction.status,
                     "images": auction.images,
                 },
@@ -136,7 +128,7 @@ class Auction:
     def start(self, current_time: datetime):
         self._assert_transaction(AuctionStatus.SCHEDULED, AuctionStatus.ACTIVE)
 
-        if self._start_time > current_time:
+        if self._start_time is None or self._start_time > current_time:
             raise InvalidAuctionStartTimeException(
                 f"Auction cannot be started before {self._start_time}."
             )
@@ -148,9 +140,10 @@ class Auction:
                 payload={
                     "id": str(self.id),
                     "start_time": self.start_time.isoformat(),
-                    "end_time": self.end_time.isoformat(),
+                    "end_time": self.end_time.isoformat() if self.end_time else "",
                     "starting_price": str(self.start_price),
                     "minimum_increment": str(self.minimun_increment),
+                    "status": self.status,
                 }
             )
         )
@@ -158,7 +151,7 @@ class Auction:
     def finish(self, current_time: datetime):
         self._assert_transaction(AuctionStatus.ACTIVE, AuctionStatus.FINISHED)
 
-        if self._end_time > current_time:
+        if self._end_time is None or self._end_time > current_time:
             raise InvalidAuctionEndTimeException(
                 f"Auction cannot be finished before {self._end_time}."
             )
@@ -212,7 +205,7 @@ class Auction:
             self._end_time = current_time + timedelta(seconds=60)
 
         self.events.append(
-            AuctionExtendedEvent(  # <-- CORREÇÃO
+            AuctionExtendedEvent(
                 payload={
                     "id": str(self.id),
                     "end_time": self.end_time.isoformat(),
@@ -250,11 +243,11 @@ class Auction:
         return self._minimun_increment
 
     @property
-    def start_time(self) -> datetime:
+    def start_time(self) -> datetime | None:
         return self._start_time
 
     @property
-    def end_time(self) -> datetime:
+    def end_time(self) -> datetime | None:
         return self._end_time
 
     @property

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+import uuid
 
 from app.core.database.session import get_db
 
@@ -27,11 +28,11 @@ def get_user_repository(
 
 @router.get("/{id}", status_code=status.HTTP_200_OK)
 async def get_user_by_id(
-    id: str,
+    id: uuid.UUID,
     repository: UserRepository = Depends(get_user_repository),
 ):
     usecase = GetUserByIdUseCase(repository)
-    user = await usecase.execute(id)
+    user = await usecase.execute(str(id))
     return {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
 
 
@@ -60,19 +61,19 @@ async def create_user(
 
 @router.patch("/{id}", status_code=status.HTTP_202_ACCEPTED)
 async def update_user(
-    id: str,
+    id: uuid.UUID,
     data: UpdateUserSchema,
     repository: UserRepository = Depends(get_user_repository),
 ):
     usecase = UpdateUserUseCase(repository)
-    user = await usecase.execute(id, data)
+    user = await usecase.execute(str(id), data)
     return {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    id: str,
+    id: uuid.UUID,
     repository: UserRepository = Depends(get_user_repository),
 ):
     usecase = DeleteUserUseCase(repository)
-    await usecase.execute(id)
+    await usecase.execute(str(id))

@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: fastapi_auction_postgres
+    environment:
+      POSTGRES_DB: auction_db
+      POSTGRES_USER: auction_user
+      POSTGRES_PASSWORD: auction_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: fastapi_auction_redis
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_data:/data
+
+  api:
+    build: .
+    container_name: fastapi_auction_api
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://auction_user:auction_password@postgres:5432/auction_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=minha_chave_super_secreta_pro_jwt
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    volumes:
+      # Esse volume espelha o seu código para dentro do container em tempo real!
+      - .:/app
+    command: >
+      bash -c "uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  postgres_data:
+  redis_data:

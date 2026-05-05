@@ -4,15 +4,7 @@ from app.modules.users.domain.users_aggregate import User
 
 class IUsersRepository(ABC):
     @abstractmethod
-    async def create(self, user: User) -> None:
-        pass
-
-    @abstractmethod
-    async def update(self, user: User) -> None:
-        pass
-
-    @abstractmethod
-    async def delete(self, user: User) -> None:
+    async def save(self, user: User) -> None:
         pass
 
     @abstractmethod

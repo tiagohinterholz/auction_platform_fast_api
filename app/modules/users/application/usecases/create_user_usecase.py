@@ -8,6 +8,7 @@ class CreateUserUseCase:
         self.repository = repository
 
     async def execute(self, data: CreateUserSchema) -> User:
+
         user = User.create(
             name=data.name,
             email=data.email,
@@ -15,6 +16,5 @@ class CreateUserUseCase:
             password_hash=data.password,
             role="USER",
         )
-
-        await self.repository.create(user)
+        await self.repository.save(user)
         return user

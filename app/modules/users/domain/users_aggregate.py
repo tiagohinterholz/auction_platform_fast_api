@@ -19,6 +19,7 @@ class User:
         cpf: str,
         password_hash: str,
         role: UserRole,
+        is_active: bool = True,
     ):
         self._id = id
         self._name = name
@@ -26,6 +27,7 @@ class User:
         self._cpf = cpf
         self._password_hash = password_hash
         self._role = role
+        self._is_active = is_active
         self.events: List = []
 
     @classmethod
@@ -46,11 +48,12 @@ class User:
             cpf=cpf,
             password_hash=password_hash,
             role=role,
+            is_active=True,
         )
         user.events.append(
             UserCreatedEvent(
                 payload={
-                    "id": user.id,
+                    "id": str(user.id),
                     "name": user.name,
                     "email": user.email,
                     "cpf": user.cpf,
@@ -66,12 +69,12 @@ class User:
         if email is not None:
             if "@" not in email:
                 raise InvalidUserEmailException(email)
-            self._mail = email
+            self._email = email
 
         self.events.append(
             UserUpdatedEvent(
                 payload={
-                    "id": self.id,
+                    "id": str(self.id),
                     "name": self.name,
                     "email": self.email,
                 },
@@ -79,10 +82,11 @@ class User:
         )
 
     def delete(self) -> None:
+        self._is_active = False
         self.events.append(
             UserDeletedEvent(
                 payload={
-                    "id": self.id,
+                    "id": str(self.id),
                     "name": self.name,
                     "email": self.email,
                 },
@@ -117,3 +121,7 @@ class User:
     @property
     def role(self) -> UserRole:
         return self._role
+
+    @property
+    def is_active(self) -> bool:
+        return self._is_active

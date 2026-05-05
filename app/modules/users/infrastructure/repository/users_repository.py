@@ -18,6 +18,7 @@ class UserRepository(IUsersRepository):
         user._cpf = model.cpf
         user._password_hash = model.password_hash
         user._role = model.role
+        user._is_active = model.is_active
         user.events = []
         return user
 
@@ -39,18 +40,6 @@ class UserRepository(IUsersRepository):
             return None
         return self._to_domain(user_model)
 
-    async def create(self, user: User) -> None:
-        user_model = UserModel(
-            id=user.id,
-            name=user.name,
-            email=user.email,
-            cpf=user.cpf,
-            password_hash=user.password_hash,
-            role=user.role,
-        )
-        self.session.add(user_model)
-        await self.session.commit()
-
     async def get_by_id(self, id: str) -> User | None:
         result = await self.session.execute(select(UserModel).where(UserModel.id == id))
         user_model = result.scalars().first()
@@ -63,20 +52,15 @@ class UserRepository(IUsersRepository):
         user_models = result.scalars().all()
         return [self._to_domain(model) for model in user_models]
 
-    async def delete(self, user: User) -> None:
-        result = await self.session.execute(
-            select(UserModel).where(UserModel.id == user.id)
+    async def save(self, user: User) -> None:
+        user_model = UserModel(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            cpf=user.cpf,
+            password_hash=user.password_hash,
+            role=user.role,
+            is_active=user.is_active,
         )
-        user_model = result.scalars().first()
-        if not user_model:
-            return
-        await self.session.delete(user_model)
-        await self.session.commit()
-
-    async def update(self, user: User) -> None:
-        user_model = await self.session.get(UserModel, user.id)
-        if not user_model:
-            return
-        user_model.name = user.name
-        user_model.email = user.email
+        await self.session.merge(user_model)
         await self.session.commit()

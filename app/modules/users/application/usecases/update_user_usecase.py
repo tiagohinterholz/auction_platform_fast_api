@@ -15,6 +15,6 @@ class UpdateUserUseCase:
             raise UserNotFoundException(user_id)
 
         user.update(name=data.name, email=data.email)
-        await self.repository.update(user)
+        await self.repository.save(user)
 
         return user

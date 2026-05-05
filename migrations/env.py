@@ -10,6 +10,8 @@ from alembic import context
 from app.core.config import settings
 from app.core.database.base import Base
 from app.modules.users.infrastructure.persistence.users_model import UserModel  # noqa
+from app.modules.auction.infrastructure.persistence.auction_model import AuctionModel  # noqa
+from app.modules.auction.application.read_models.auction_read_model import AuctionReadModel  # noqa
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

@@ -1,7 +1,7 @@
 from app.modules.users.application.schemas.create_user_schema import CreateUserSchema
 from app.modules.users.domain.users_aggregate import User
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
-from app.modules.users.domain.enums import UserRole
+from app.modules.users.domain.enums.user_role import UserRole
 
 
 class CreateUserUseCase:

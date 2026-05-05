@@ -1,6 +1,7 @@
 from app.modules.users.application.schemas.create_user_schema import CreateUserSchema
 from app.modules.users.domain.users_aggregate import User
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
+from app.modules.users.domain.enums import UserRole
 
 
 class CreateUserUseCase:
@@ -14,7 +15,7 @@ class CreateUserUseCase:
             email=data.email,
             cpf=data.cpf,
             password_hash=data.password,
-            role="USER",
+            role=UserRole.USER,
         )
         await self.repository.save(user)
         return user

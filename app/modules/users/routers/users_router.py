@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List
 import uuid
 
 from app.core.database.session import get_db
@@ -16,6 +17,7 @@ from app.modules.users.application.usecases.get_all_users_usecase import (
 from app.modules.users.application.usecases.update_user_usecase import UpdateUserUseCase
 from app.modules.users.application.schemas.create_user_schema import CreateUserSchema
 from app.modules.users.application.schemas.update_user_schema import UpdateUserSchema
+from app.modules.users.application.schemas.user_response_schema import UserResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -26,26 +28,23 @@ def get_user_repository(
     return UserRepository(session)
 
 
-@router.get("/{id}", status_code=status.HTTP_200_OK)
+@router.get("/{id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 async def get_user_by_id(
     id: uuid.UUID,
     repository: UserRepository = Depends(get_user_repository),
 ):
     usecase = GetUserByIdUseCase(repository)
     user = await usecase.execute(str(id))
-    return {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
+    return user
 
 
-@router.get("", status_code=status.HTTP_200_OK)
+@router.get("", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
 async def get_all_users(
     repository: UserRepository = Depends(get_user_repository),
 ):
     usecase = GetAllUsersUseCase(repository)
     users = await usecase.execute()
-    return [
-        {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
-        for user in users
-    ]
+    return users
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

@@ -13,15 +13,15 @@ from .events.users_events import UserCreatedEvent, UserDeletedEvent, UserUpdated
 class User:
     def __init__(
         self,
-        id: uuid.UUID,
         name: str,
         email: str,
         cpf: str,
         password_hash: str,
         role: UserRole,
         is_active: bool = True,
+        id: uuid.UUID | None = None,
     ):
-        self._id = id
+        self._id = id or uuid.uuid4()
         self._name = name
         self._email = email
         self._cpf = cpf
@@ -42,7 +42,6 @@ class User:
             raise InvalidUserCPFException()
 
         user = cls(
-            id=uuid.uuid4(),
             name=name,
             email=email,
             cpf=cpf,
@@ -60,6 +59,12 @@ class User:
                 },
             )
         )
+        return user
+
+    @classmethod
+    def restore(cls, **kwargs) -> "User":
+        user = cls(**kwargs)
+        user.events = []
         return user
 
     def update(self, name: Optional[str] = None, email: Optional[str] = None) -> None:

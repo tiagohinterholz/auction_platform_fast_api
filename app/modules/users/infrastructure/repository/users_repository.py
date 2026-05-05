@@ -11,16 +11,15 @@ class UserRepository(IUsersRepository):
         self.session = session
 
     def _to_domain(self, model: UserModel) -> User:
-        user = User.__new__(User)
-        user._id = model.id
-        user._name = model.name
-        user._email = model.email
-        user._cpf = model.cpf
-        user._password_hash = model.password_hash
-        user._role = model.role
-        user._is_active = model.is_active
-        user.events = []
-        return user
+        return User.restore(
+            id=model.id,
+            name=model.name,
+            email=model.email,
+            cpf=model.cpf,
+            password_hash=model.password_hash,
+            role=model.role,
+            is_active=model.is_active,
+        )
 
     async def get_by_cpf(self, cpf: str) -> User | None:
         result = await self.session.execute(

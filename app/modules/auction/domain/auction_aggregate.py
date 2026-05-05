@@ -24,7 +24,6 @@ from .events.auction_events import (
 class Auction:
     def __init__(
         self,
-        id: uuid.UUID,
         user_id: uuid.UUID,
         title: str,
         description: str,
@@ -34,8 +33,9 @@ class Auction:
         images: list[str],
         start_time: datetime | None = None,
         end_time: datetime | None = None,
+        id: uuid.UUID | None = None,
     ):
-        self._id = id
+        self._id = id or uuid.uuid4()
         self._user_id = user_id
         self._title = title
         self._description = description
@@ -50,7 +50,6 @@ class Auction:
     @classmethod
     def create(
         cls,
-        id: uuid.UUID,
         user_id: uuid.UUID,
         title: str,
         description: str,
@@ -73,7 +72,6 @@ class Auction:
         safe_images = images or []
 
         auction = cls(
-            id=uuid.uuid4(),
             user_id=user_id,
             title=title,
             description=description,
@@ -96,6 +94,12 @@ class Auction:
                 },
             )
         )
+        return auction
+
+    @classmethod
+    def restore(cls, **kwargs) -> "Auction":
+        auction = cls(**kwargs)
+        auction.events = []
         return auction
 
     def schedule(self, start_time: datetime, end_time: datetime):

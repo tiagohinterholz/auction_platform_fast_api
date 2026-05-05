@@ -5,7 +5,7 @@ from app.core.database.base import Base
 
 
 class AuctionReadModel(Base):
-    __tablename__ = "auction_read_model"
+    __tablename__ = "auctions_read"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False)

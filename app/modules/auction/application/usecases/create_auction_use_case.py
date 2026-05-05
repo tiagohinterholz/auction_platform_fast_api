@@ -19,7 +19,6 @@ class CreateAuctionUseCase:
 
     async def execute(self, data: CreateAuctionSchema) -> Auction:
         auction = Auction.create(
-            id=uuid.uuid4(),
             user_id=uuid.UUID(data.user_id),
             title=data.title,
             description=data.description or "",

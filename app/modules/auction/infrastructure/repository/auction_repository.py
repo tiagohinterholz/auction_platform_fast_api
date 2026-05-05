@@ -11,17 +11,18 @@ class AuctionRepository(IAuctionRepository):
         self.session = session
     
     def _to_domain(self, model: AuctionModel) -> Auction:
-        auction = Auction.__new__(Auction)
-        auction._id = model.id
-        auction._title = model.title
-        auction._user_id = model.user_id
-        auction._description = model.description
-        auction._minimun_increment = model.minimun_increment
-        auction._start_time = model.start_time
-        auction._end_time = model.end_time
-        auction._status = model.status
-        auction.events = []
-        return auction
+        return Auction.restore(
+            id=model.id,
+            user_id=model.user_id,
+            title=model.title,
+            description=model.description,
+            start_price=model.start_price,
+            minimun_increment=model.minimun_increment,
+            start_time=model.start_time,
+            end_time=model.end_time,
+            status=model.status,
+            images=model.images or [],
+        )
 
     async def get_by_id(self, id: str) -> Auction | None:
         result = await self.session.execute(

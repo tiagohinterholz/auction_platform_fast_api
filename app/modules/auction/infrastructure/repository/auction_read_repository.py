@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
-from app.modules.auction.application.read_models.auction_read_model import (
+from app.modules.auction.infrastructure.persistence.auction_read_model import (
     AuctionReadModel,
 )
 

@@ -29,7 +29,7 @@ class ScheduleAuctionUseCase:
             end_time=data.end_date,
         )
 
-        await self._repository.schedule(auction)
+        await self._repository.save(auction)
         events = auction.pull_events()
         await self._event_bus.publish(events)
 

@@ -28,7 +28,7 @@ class CreateAuctionUseCase:
             status=AuctionStatus(data.status),
             images=data.images,
         )
-        await self._repository.create(auction)
+        await self._repository.save(auction)
         events = auction.pull_events()
         await self._event_bus.publish(events)
         return auction

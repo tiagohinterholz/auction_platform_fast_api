@@ -24,7 +24,7 @@ class StartAuctionUseCase:
             raise InvalidAuctionIdException(f"Auction with id {id} not found.")
 
         auction.start(current_date)
-        await self._repository.start(auction)
+        await self._repository.save(auction)
         events = auction.pull_events()
         await self._event_bus.publish(events)
         return auction

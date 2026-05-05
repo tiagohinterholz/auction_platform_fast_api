@@ -25,9 +25,7 @@ class CancelAuctionUseCase:
             raise InvalidAuctionIdException(f"Auction with id {id} not found.")
 
         auction.cancel(current_date, reason)
-        await self._repository.cancel(
-            auction,
-        )
+        await self._repository.save(auction)
         events = auction.pull_events()
         await self._event_bus.publish(events)
         return auction

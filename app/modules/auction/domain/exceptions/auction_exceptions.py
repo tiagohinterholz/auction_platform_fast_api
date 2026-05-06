@@ -1,10 +1,16 @@
 from app.core.exceptions.exceptions import DomainException
 from datetime import datetime
+import uuid
 
 
 class InvalidAuctionTitleException(DomainException):
     def __init__(self, title: str):
         super().__init__(f"Invalid auction title: {title}")
+
+
+class InvalidAuctionIdException(DomainException):
+    def __init__(self, id: uuid.UUID):
+        super().__init__(f"Invalid auction id: {id}")
 
 
 class InvalidAuctionDescriptionException(DomainException):

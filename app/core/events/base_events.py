@@ -7,4 +7,4 @@ from pydantic import BaseModel, Field
 class BaseDomainEvent(BaseModel, ABC):
     name: str
     payload: Dict[str, Any]
-    occured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

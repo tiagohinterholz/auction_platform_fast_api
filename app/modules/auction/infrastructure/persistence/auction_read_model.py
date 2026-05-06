@@ -1,0 +1,21 @@
+import uuid
+from sqlalchemy import Column, String, Float, DateTime, JSON
+from sqlalchemy.dialects.postgresql import UUID
+from app.core.database.base import Base
+
+
+class AuctionReadModel(Base):
+    __tablename__ = "auctions_read"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), nullable=False)
+    description = Column(String(255), nullable=False)
+    title = Column(String(100), nullable=False)
+    status = Column(String(50), nullable=False, default="CREATED")
+    start_price = Column(Float, nullable=False)
+    minimun_increment = Column(Float, nullable=False)
+    highest_bid = Column(Float, nullable=True)
+    start_time = Column(DateTime, nullable=True)
+    end_time = Column(DateTime, nullable=True)
+    reason = Column(String(255), nullable=True)
+    images = Column(JSON, nullable=True)

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database.base import Base
 
@@ -13,3 +13,4 @@ class UserModel(Base):
     cpf = Column(String(11), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False, default="USER")
+    is_active = Column(Boolean, nullable=False, default=True)

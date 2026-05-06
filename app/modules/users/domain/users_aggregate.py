@@ -13,19 +13,21 @@ from .events.users_events import UserCreatedEvent, UserDeletedEvent, UserUpdated
 class User:
     def __init__(
         self,
-        id: uuid.UUID,
         name: str,
         email: str,
         cpf: str,
         password_hash: str,
         role: UserRole,
+        is_active: bool = True,
+        id: uuid.UUID | None = None,
     ):
-        self._id = id
+        self._id = id or uuid.uuid4()
         self._name = name
         self._email = email
         self._cpf = cpf
         self._password_hash = password_hash
         self._role = role
+        self._is_active = is_active
         self.events: List = []
 
     @classmethod
@@ -40,17 +42,17 @@ class User:
             raise InvalidUserCPFException()
 
         user = cls(
-            id=uuid.uuid4(),
             name=name,
             email=email,
             cpf=cpf,
             password_hash=password_hash,
             role=role,
+            is_active=True,
         )
         user.events.append(
             UserCreatedEvent(
                 payload={
-                    "id": user.id,
+                    "id": str(user.id),
                     "name": user.name,
                     "email": user.email,
                     "cpf": user.cpf,
@@ -59,19 +61,25 @@ class User:
         )
         return user
 
+    @classmethod
+    def restore(cls, **kwargs) -> "User":
+        user = cls(**kwargs)
+        user.events = []
+        return user
+
     def update(self, name: Optional[str] = None, email: Optional[str] = None) -> None:
         if name is not None:
             self._name = name
 
         if email is not None:
             if "@" not in email:
-                raise InvalidUserEmailException(email)
-            self._mail = email
+                raise InvalidUserEmailException()
+            self._email = email
 
         self.events.append(
             UserUpdatedEvent(
                 payload={
-                    "id": self.id,
+                    "id": str(self.id),
                     "name": self.name,
                     "email": self.email,
                 },
@@ -79,10 +87,11 @@ class User:
         )
 
     def delete(self) -> None:
+        self._is_active = False
         self.events.append(
             UserDeletedEvent(
                 payload={
-                    "id": self.id,
+                    "id": str(self.id),
                     "name": self.name,
                     "email": self.email,
                 },
@@ -117,3 +126,7 @@ class User:
     @property
     def role(self) -> UserRole:
         return self._role
+
+    @property
+    def is_active(self) -> bool:
+        return self._is_active

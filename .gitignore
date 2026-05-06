@@ -18,3 +18,8 @@ __pycache__/
 .mypy_cache/
 .coverage
 .local.md
+settings.json
+
+#IA
+.codex
+AGENTS.md

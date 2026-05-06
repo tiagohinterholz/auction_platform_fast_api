@@ -7,7 +7,6 @@ from app.modules.auction.infrastructure.repository.auction_repository import (
 from app.modules.auction.infrastructure.event_bus import DummyEventBus
 from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
 
-# Use Cases
 from app.modules.auction.application.usecases.create_auction_use_case import (
     CreateAuctionUseCase,
 )

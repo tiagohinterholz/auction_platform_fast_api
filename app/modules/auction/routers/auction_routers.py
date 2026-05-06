@@ -47,7 +47,9 @@ router = APIRouter(prefix="/auction", tags=["Auction"])
 async def get_all_auctions(
     auction_repository: AuctionRepository = Depends(get_auction_repository),
 ) -> List[AuctionSchema]:
-    return await auction_repository.get_all()
+    auctions = await auction_repository.get_all()
+    
+    return [AuctionSchema.model_validate(auction) for auction in auctions]
 
 
 @router.get("/{auction_id}", status_code=status.HTTP_200_OK)
@@ -55,7 +57,8 @@ async def get_auction_by_id(
     auction_id: uuid.UUID,
     auction_repository: AuctionRepository = Depends(get_auction_repository),
 ) -> AuctionSchema:
-    return await auction_repository.get_by_id(auction_id)
+    auction = await auction_repository.get_by_id(str(auction_id))
+    return AuctionSchema.model_validate(auction)
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -63,7 +66,9 @@ async def create_auction(
     auction_schema: CreateAuctionSchema,
     usecase: CreateAuctionUseCase = Depends(get_create_auction_use_case),
 ) -> AuctionSchema:
-    return await usecase.execute(auction_schema)
+    
+    auction = await usecase.execute(auction_schema)
+    return AuctionSchema.model_validate(auction)
 
 
 @router.patch("/{auction_id}/schedule", status_code=status.HTTP_200_OK)
@@ -72,7 +77,8 @@ async def schedule_auction(
     data: ScheduleAuctionSchema,
     usecase: ScheduleAuctionUseCase = Depends(get_schedule_auction_use_case),
 ) -> AuctionSchema:
-    return await usecase.execute(auction_id, data)
+    auction = await usecase.execute(auction_id, data)
+    return AuctionSchema.model_validate(auction)
 
 
 @router.patch("/{auction_id}/cancel", status_code=status.HTTP_200_OK)
@@ -81,16 +87,17 @@ async def cancel_auction(
     data: CancelAuctionSchema,
     usecase: CancelAuctionUseCase = Depends(get_cancel_auction_use_case),
 ) -> AuctionSchema:
-    return await usecase.execute(
+    auction = await usecase.execute(
         id=auction_id,
         current_date=datetime.now(),
         reason=data.reason,
     )
-
+    return AuctionSchema.model_validate(auction)
 
 @router.patch("/{auction_id}/finish", status_code=status.HTTP_200_OK)
 async def finish_auction(
     auction_id: uuid.UUID,
     usecase: FinishAuctionUseCase = Depends(get_finish_auction_use_case),
 ) -> AuctionSchema:
-    return await usecase.execute(auction_id)
+    auction = await usecase.execute(auction_id, current_date=datetime.now())
+    return AuctionSchema.model_validate(auction)

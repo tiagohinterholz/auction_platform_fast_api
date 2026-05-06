@@ -73,7 +73,7 @@ class User:
 
         if email is not None:
             if "@" not in email:
-                raise InvalidUserEmailException(email)
+                raise InvalidUserEmailException()
             self._email = email
 
         self.events.append(

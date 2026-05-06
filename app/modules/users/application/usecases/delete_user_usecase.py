@@ -12,6 +12,6 @@ class DeleteUserUseCase:
         if not user:
             raise UserNotFoundException(user_id)
 
-        await self.repository.delete(user)
+        await self.repository.save(user)
 
         return None

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import List
+from typing import Sequence
 from app.modules.auction.infrastructure.persistence.auction_read_model import (
     AuctionReadModel,
 )
@@ -20,7 +20,7 @@ class AuctionReadRepository:
         result = await self.session.execute(query)
         return result.scalars().first()
 
-    async def get_all(self) -> List[AuctionReadModel]:
+    async def get_all(self) -> Sequence[AuctionReadModel]:
         query = select(AuctionReadModel)
         result = await self.session.execute(query)
         return result.scalars().all()

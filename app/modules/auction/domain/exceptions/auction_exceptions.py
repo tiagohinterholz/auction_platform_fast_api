@@ -9,7 +9,7 @@ class InvalidAuctionTitleException(DomainException):
 
 
 class InvalidAuctionIdException(DomainException):
-    def __init__(self, id: uuid.UUID):
+    def __init__(self, id: str):
         super().__init__(f"Invalid auction id: {id}")
 
 
@@ -24,7 +24,7 @@ class InvalidAuctionStartPriceException(DomainException):
 
 
 class InvalidAuctionEndTimeException(DomainException):
-    def __init__(self, end_time: datetime):
+    def __init__(self, end_time: str):
         super().__init__(f"Invalid auction end time: {end_time}")
 
 
@@ -34,7 +34,7 @@ class InvalidAuctionMinimunIncrementException(DomainException):
 
 
 class InvalidAuctionStartTimeException(DomainException):
-    def __init__(self, start_time: datetime):
+    def __init__(self, start_time: str):
         super().__init__(f"Invalid auction start time: {start_time}")
 
 

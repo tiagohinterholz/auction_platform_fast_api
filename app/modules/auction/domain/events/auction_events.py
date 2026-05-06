@@ -1,9 +1,11 @@
+from typing import Any
+
 from app.core.events.base_events import BaseDomainEvent
 
 
 class AuctionCreatedEvent(BaseDomainEvent):
     name: str = "auction.created"
-    payload: dict[str, str]
+    payload: dict[str, Any]
 
 
 class AuctionStartedEvent(BaseDomainEvent):

@@ -19,7 +19,7 @@ class StartAuctionUseCase:
         self._event_bus = event_bus
 
     async def execute(self, id: uuid.UUID, current_date: datetime) -> Auction:
-        auction = await self._repository.get_by_id(id)
+        auction = await self._repository.get_by_id(str(id))
         if not auction:
             raise InvalidAuctionIdException(f"Auction with id {id} not found.")
 

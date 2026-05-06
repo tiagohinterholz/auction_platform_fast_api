@@ -30,7 +30,7 @@ class Auction:
         start_price: float,
         minimun_increment: float,
         status: AuctionStatus,
-        images: list[str],
+        images: List[str],
         start_time: datetime | None = None,
         end_time: datetime | None = None,
         id: uuid.UUID | None = None,
@@ -56,7 +56,7 @@ class Auction:
         start_price: float,
         minimun_increment: float,
         status: AuctionStatus,
-        images: list[str] | None = None,
+        images: List[str] | None = None,
     ) -> "Auction":
         if not title.strip():
             raise InvalidAuctionTitleException(title)
@@ -89,7 +89,7 @@ class Auction:
                     "description": auction.description,
                     "start_price": str(auction.start_price),
                     "minimun_increment": str(auction.minimun_increment),
-                    "status": auction.status,
+                    "status": auction.status.value,
                     "images": auction.images,
                 },
             )
@@ -106,7 +106,7 @@ class Auction:
         self._assert_transaction(AuctionStatus.CREATED, AuctionStatus.SCHEDULED)
 
         if start_time >= end_time:
-            raise InvalidAuctionStartTimeException(start_time)
+            raise InvalidAuctionStartTimeException(start_time.isoformat())
 
         if start_time <= datetime.now():
             raise InvalidAuctionStartTimeException(
@@ -121,8 +121,8 @@ class Auction:
             AuctionScheduledEvent(
                 payload={
                     "id": str(self.id),
-                    "start_time": self.start_time.isoformat(),
-                    "end_time": self.end_time.isoformat(),
+                    "start_time": self.start_time.isoformat() if self.start_time else "",
+                    "end_time": self.end_time.isoformat() if self.end_time else "",
                     "starting_price": str(self.start_price),
                     "minimum_increment": str(self.minimun_increment),
                 }
@@ -143,7 +143,7 @@ class Auction:
             AuctionStartedEvent(
                 payload={
                     "id": str(self.id),
-                    "start_time": self.start_time.isoformat(),
+                    "start_time": self.start_time.isoformat() if self.start_time else "",
                     "end_time": self.end_time.isoformat() if self.end_time else "",
                     "starting_price": str(self.start_price),
                     "minimum_increment": str(self.minimun_increment),
@@ -166,7 +166,7 @@ class Auction:
             AuctionFinishedEvent(
                 payload={
                     "id": str(self.id),
-                    "end_time": self.end_time.isoformat(),
+                    "end_time": self.end_time.isoformat() if self.end_time else "",
                 }
             )
         )
@@ -212,7 +212,7 @@ class Auction:
             AuctionExtendedEvent(
                 payload={
                     "id": str(self.id),
-                    "end_time": self.end_time.isoformat(),
+                    "end_time": self.end_time.isoformat() if self.end_time else "",
                 }
             )
         )

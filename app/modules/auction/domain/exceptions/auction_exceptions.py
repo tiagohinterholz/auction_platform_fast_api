@@ -1,6 +1,4 @@
 from app.core.exceptions.exceptions import DomainException
-from datetime import datetime
-import uuid
 
 
 class InvalidAuctionTitleException(DomainException):
@@ -28,9 +26,9 @@ class InvalidAuctionEndTimeException(DomainException):
         super().__init__(f"Invalid auction end time: {end_time}")
 
 
-class InvalidAuctionMinimunIncrementException(DomainException):
-    def __init__(self, minimun_increment: float):
-        super().__init__(f"Invalid auction minimun increment: {minimun_increment}")
+class InvalidAuctionminimumIncrementException(DomainException):
+    def __init__(self, minimum_increment: float):
+        super().__init__(f"Invalid auction minimum increment: {minimum_increment}")
 
 
 class InvalidAuctionStartTimeException(DomainException):
@@ -41,3 +39,8 @@ class InvalidAuctionStartTimeException(DomainException):
 class InvalidAuctionStatusException(DomainException):
     def __init__(self, status: str):
         super().__init__(f"Invalid auction status: {status}")
+
+
+class AuctionNotFoundException(DomainException):
+    def __init__(self, auction_id: str):
+        super().__init__(f"Auction with id {auction_id} not found.")

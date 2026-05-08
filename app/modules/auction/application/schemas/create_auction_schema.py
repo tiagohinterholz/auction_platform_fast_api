@@ -6,6 +6,6 @@ class CreateAuctionSchema(BaseModel):
     description: str | None = Field(default=None, max_length=1000)
     user_id: str = Field(..., min_length=36, max_length=36)
     start_price: float = Field(..., ge=0)
-    minimun_increment: float = Field(..., ge=0)
+    minimum_increment: float = Field(..., ge=0)
     status: str = Field(default="created")
     images: list[str] | None = Field(default=None)

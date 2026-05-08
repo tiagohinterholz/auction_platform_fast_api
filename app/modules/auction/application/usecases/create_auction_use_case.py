@@ -23,7 +23,7 @@ class CreateAuctionUseCase:
             title=data.title,
             description=data.description or "",
             start_price=data.start_price,
-            minimun_increment=data.minimun_increment,
+            minimum_increment=data.minimum_increment,
             status=AuctionStatus(data.status),
             images=data.images,
         )

@@ -6,7 +6,7 @@ from .exceptions.auction_exceptions import (
     InvalidAuctionTitleException,
     InvalidAuctionDescriptionException,
     InvalidAuctionStartPriceException,
-    InvalidAuctionMinimunIncrementException,
+    InvalidAuctionminimumIncrementException,
     InvalidAuctionStartTimeException,
     InvalidAuctionStatusException,
     InvalidAuctionEndTimeException,
@@ -28,7 +28,7 @@ class Auction:
         title: str,
         description: str,
         start_price: float,
-        minimun_increment: float,
+        minimum_increment: float,
         status: AuctionStatus,
         images: List[str],
         start_time: datetime | None = None,
@@ -40,7 +40,7 @@ class Auction:
         self._title = title
         self._description = description
         self._start_price = start_price
-        self._minimun_increment = minimun_increment
+        self._minimum_increment = minimum_increment
         self._start_time = start_time
         self._end_time = end_time
         self._status = status
@@ -54,7 +54,7 @@ class Auction:
         title: str,
         description: str,
         start_price: float,
-        minimun_increment: float,
+        minimum_increment: float,
         status: AuctionStatus,
         images: List[str] | None = None,
     ) -> "Auction":
@@ -64,8 +64,8 @@ class Auction:
             raise InvalidAuctionDescriptionException(description)
         if start_price <= 0:
             raise InvalidAuctionStartPriceException(start_price)
-        if minimun_increment <= 0:
-            raise InvalidAuctionMinimunIncrementException(minimun_increment)
+        if minimum_increment <= 0:
+            raise InvalidAuctionminimumIncrementException(minimum_increment)
         if status not in AuctionStatus:
             raise InvalidAuctionStatusException(status)
 
@@ -76,7 +76,7 @@ class Auction:
             title=title,
             description=description,
             start_price=start_price,
-            minimun_increment=minimun_increment,
+            minimum_increment=minimum_increment,
             status=status,
             images=safe_images,
         )
@@ -88,7 +88,7 @@ class Auction:
                     "title": auction.title,
                     "description": auction.description,
                     "start_price": str(auction.start_price),
-                    "minimun_increment": str(auction.minimun_increment),
+                    "minimum_increment": str(auction.minimum_increment),
                     "status": auction.status.value,
                     "images": auction.images,
                 },
@@ -124,7 +124,7 @@ class Auction:
                     "start_time": self.start_time.isoformat() if self.start_time else "",
                     "end_time": self.end_time.isoformat() if self.end_time else "",
                     "starting_price": str(self.start_price),
-                    "minimum_increment": str(self.minimun_increment),
+                    "minimum_increment": str(self.minimum_increment),
                 }
             )
         )
@@ -146,7 +146,7 @@ class Auction:
                     "start_time": self.start_time.isoformat() if self.start_time else "",
                     "end_time": self.end_time.isoformat() if self.end_time else "",
                     "starting_price": str(self.start_price),
-                    "minimum_increment": str(self.minimun_increment),
+                    "minimum_increment": str(self.minimum_increment),
                     "status": self.status,
                 }
             )
@@ -243,8 +243,8 @@ class Auction:
         return self._start_price
 
     @property
-    def minimun_increment(self) -> float:
-        return self._minimun_increment
+    def minimum_increment(self) -> float:
+        return self._minimum_increment
 
     @property
     def start_time(self) -> datetime | None:

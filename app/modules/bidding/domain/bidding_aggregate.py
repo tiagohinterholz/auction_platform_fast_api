@@ -11,7 +11,7 @@ class Bidding:
         self,
         auction_id: uuid.UUID,
         current_price: float,
-        minimun_increment: float, 
+        minimum_increment: float, 
         last_user_id: uuid.UUID | None, 
         last_amount: float | None, 
         timestamp: datetime | None = None,
@@ -19,7 +19,7 @@ class Bidding:
     ):
         self._id = id or uuid.uuid4()
         self._current_price = current_price
-        self._minimun_increment = minimun_increment
+        self._minimum_increment = minimum_increment
         self._auction_id = auction_id
         self._last_user_id = last_user_id
         self._last_amount = last_amount
@@ -27,11 +27,11 @@ class Bidding:
         self.events: List = []
     
     @classmethod
-    def open(cls, auction_id: uuid.UUID, starting_price: float, minimun_increment: float) -> "Bidding":
+    def open(cls, auction_id: uuid.UUID, starting_price: float, minimum_increment: float) -> "Bidding":
         return cls(
             auction_id=auction_id,
             current_price=starting_price,
-            minimun_increment=minimun_increment,
+            minimum_increment=minimum_increment,
             last_user_id=None,
             last_amount=None,
         )
@@ -43,9 +43,9 @@ class Bidding:
         return bid
     
     def place_bid(self, user_id: uuid.UUID, amount: float):
-        if amount < self._current_price + self._minimun_increment:
+        if amount < self._current_price + self._minimum_increment:
             raise InvalidBidPlaceException(
-                f"Bid amount must be at least {self._current_price + self._minimun_increment}"
+                f"Bid amount must be at least {self._current_price + self._minimum_increment}"
             )
         
         self._last_user_id = user_id
@@ -75,8 +75,8 @@ class Bidding:
         return self._current_price
 
     @property   
-    def minimun_increment(self) -> float:
-        return self._minimun_increment
+    def minimum_increment(self) -> float:
+        return self._minimum_increment
 
     @property
     def auction_id(self) -> uuid.UUID:

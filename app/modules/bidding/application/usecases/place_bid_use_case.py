@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.modules.bidding.domain.ports.bid_repository_interface import IBiddingRepository
+from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
 from app.modules.auction.domain.ports.auction_read_repository_interface import IAuctionReadRepository
 from app.modules.bidding.domain.ports.event_bus_interface import EventBusInterface 
 from app.core.locks.lock_interface import ILockService

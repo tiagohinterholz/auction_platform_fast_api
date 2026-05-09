@@ -4,6 +4,9 @@ from app.core.database.session import get_db
 from app.modules.auction.infrastructure.repository.auction_repository import (
     AuctionRepository,
 )
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
 from app.modules.auction.infrastructure.event_bus import DummyEventBus
 from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
 
@@ -25,6 +28,12 @@ def get_auction_repository(
     session: AsyncSession = Depends(get_db),
 ) -> AuctionRepository:
     return AuctionRepository(session)
+
+
+def get_auction_read_repository(
+    session: AsyncSession = Depends(get_db),
+) -> AuctionReadRepository:
+    return AuctionReadRepository(session)
 
 
 def get_event_bus() -> EventBusInterface:

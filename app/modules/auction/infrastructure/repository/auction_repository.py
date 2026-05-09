@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -49,7 +51,7 @@ class AuctionRepository(IAuctionRepository):
         await self.session.merge(auction_model)
         await self.session.commit()
     
-    async def get_all(self) -> list[Auction]:
+    async def get_all(self) -> Sequence[Auction]:
         result = await self.session.execute(select(AuctionModel))
         auction_models = result.scalars().all()
         return [self._to_domain(model) for model in auction_models]

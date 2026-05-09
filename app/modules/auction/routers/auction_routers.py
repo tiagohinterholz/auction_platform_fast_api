@@ -4,18 +4,18 @@ from typing import List
 import uuid
 
 from app.modules.auction.routers.dependencies import (
-    get_auction_repository,
+    get_auction_read_repository,
     get_create_auction_use_case,
     get_schedule_auction_use_case,
     get_cancel_auction_use_case,
     get_finish_auction_use_case,
 )
 
-from app.modules.auction.infrastructure.repository.auction_repository import (
-    AuctionRepository,
-)
 from app.modules.auction.application.schemas.auction_schema import AuctionSchema
 
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
 
 from app.modules.auction.application.schemas.create_auction_schema import (
     CreateAuctionSchema,
@@ -45,7 +45,7 @@ router = APIRouter(prefix="/auction", tags=["Auction"])
 
 @router.get("", status_code=status.HTTP_200_OK)
 async def get_all_auctions(
-    auction_repository: AuctionRepository = Depends(get_auction_repository),
+    auction_repository: AuctionReadRepository = Depends(get_auction_read_repository),
 ) -> List[AuctionSchema]:
     auctions = await auction_repository.get_all()
     
@@ -55,7 +55,7 @@ async def get_all_auctions(
 @router.get("/{auction_id}", status_code=status.HTTP_200_OK)
 async def get_auction_by_id(
     auction_id: uuid.UUID,
-    auction_repository: AuctionRepository = Depends(get_auction_repository),
+    auction_repository: AuctionReadRepository = Depends(get_auction_read_repository),
 ) -> AuctionSchema:
     auction = await auction_repository.get_by_id(str(auction_id))
     return AuctionSchema.model_validate(auction)

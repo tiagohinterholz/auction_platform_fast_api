@@ -4,9 +4,10 @@ from typing import Sequence
 from app.modules.auction.infrastructure.persistence.auction_read_model import (
     AuctionReadModel,
 )
+from app.modules.auction.domain.ports.auction_read_repository_interface import IAuctionReadRepository
 
 
-class AuctionReadRepository:
+class AuctionReadRepository(IAuctionReadRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 

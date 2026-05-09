@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -17,7 +19,7 @@ class AuctionRepository(IAuctionRepository):
             title=model.title,
             description=model.description,
             start_price=model.start_price,
-            minimun_increment=model.minimun_increment,
+            minimum_increment=model.minimum_increment,
             start_time=model.start_time,
             end_time=model.end_time,
             status=model.status,
@@ -40,7 +42,7 @@ class AuctionRepository(IAuctionRepository):
             title=auction.title,
             description=auction.description,
             start_price=auction.start_price,
-            minimun_increment=auction.minimun_increment,
+            minimum_increment=auction.minimum_increment,
             start_time=auction.start_time,
             end_time=auction.end_time,
             status=auction.status,
@@ -49,7 +51,7 @@ class AuctionRepository(IAuctionRepository):
         await self.session.merge(auction_model)
         await self.session.commit()
     
-    async def get_all(self) -> list[Auction]:
+    async def get_all(self) -> Sequence[Auction]:
         result = await self.session.execute(select(AuctionModel))
         auction_models = result.scalars().all()
         return [self._to_domain(model) for model in auction_models]

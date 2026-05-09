@@ -10,7 +10,7 @@ class AuctionSchema(BaseModel):
     description: str
     status: str
     start_price: float
-    minimun_increment: float
+    minimum_increment: float
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     images: List[str] = []

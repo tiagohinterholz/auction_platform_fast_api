@@ -1,13 +1,15 @@
 from uuid import UUID
 from typing import List
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, status
 
 from app.modules.bidding.application.schemas.create_bid_schema import CreateBidSchema
 from app.modules.bidding.application.schemas.bid_response_schema import BidResponseSchema
 from app.modules.bidding.application.usecases.place_bid_use_case import PlaceBidUseCase
 from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
 from app.modules.bidding.routers.dependencies import get_place_bid_use_case, get_bid_read_repository
+from app.core.auth.dependencies import get_current_user
+from app.modules.users.domain.users_aggregate import User
 
 router = APIRouter(prefix="/auctions/{auction_id}/bids", tags=["Bidding"])
 
@@ -25,9 +27,8 @@ async def get_all_by_auction_id(
 async def create_bid(
     auction_id: UUID,
     data: CreateBidSchema,
-    request: Request,
     use_case: PlaceBidUseCase = Depends(get_place_bid_use_case),
+    current_user: User = Depends(get_current_user),
 ) -> dict:
-    user_id = UUID(request.headers.get("X-User-Id", "00000000-0000-0000-0000-000000000000"))
-    await use_case.execute(auction_id, user_id, data.amount)
+    await use_case.execute(auction_id, current_user.id, data.amount)
     return {"status": "created"}

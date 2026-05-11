@@ -10,35 +10,17 @@ from app.modules.auction.routers.dependencies import (
     get_cancel_auction_use_case,
     get_finish_auction_use_case,
 )
-
 from app.modules.auction.application.schemas.auction_schema import AuctionSchema
-
-from app.modules.auction.infrastructure.repository.auction_read_repository import (
-    AuctionReadRepository,
-)
-
-from app.modules.auction.application.schemas.create_auction_schema import (
-    CreateAuctionSchema,
-)
-from app.modules.auction.application.schemas.schedule_auction_schema import (
-    ScheduleAuctionSchema,
-)
-from app.modules.auction.application.schemas.cancel_auction_schema import (
-    CancelAuctionSchema,
-)
-
-from app.modules.auction.application.usecases.create_auction_use_case import (
-    CreateAuctionUseCase,
-)
-from app.modules.auction.application.usecases.schedule_auction_use_case import (
-    ScheduleAuctionUseCase,
-)
-from app.modules.auction.application.usecases.cancel_auction_use_case import (
-    CancelAuctionUseCase,
-)
-from app.modules.auction.application.usecases.finish_auction_use_case import (
-    FinishAuctionUseCase,
-)
+from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
+from app.modules.auction.application.schemas.create_auction_schema import CreateAuctionSchema
+from app.modules.auction.application.schemas.schedule_auction_schema import ScheduleAuctionSchema
+from app.modules.auction.application.schemas.cancel_auction_schema import CancelAuctionSchema
+from app.modules.auction.application.usecases.create_auction_use_case import CreateAuctionUseCase
+from app.modules.auction.application.usecases.schedule_auction_use_case import ScheduleAuctionUseCase
+from app.modules.auction.application.usecases.cancel_auction_use_case import CancelAuctionUseCase
+from app.modules.auction.application.usecases.finish_auction_use_case import FinishAuctionUseCase
+from app.core.auth.dependencies import get_current_user
+from app.modules.users.domain.users_aggregate import User
 
 router = APIRouter(prefix="/auction", tags=["Auction"])
 
@@ -48,7 +30,6 @@ async def get_all_auctions(
     auction_repository: AuctionReadRepository = Depends(get_auction_read_repository),
 ) -> List[AuctionSchema]:
     auctions = await auction_repository.get_all()
-    
     return [AuctionSchema.model_validate(auction) for auction in auctions]
 
 
@@ -63,11 +44,11 @@ async def get_auction_by_id(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_auction(
-    auction_schema: CreateAuctionSchema,
+    data: CreateAuctionSchema,
     usecase: CreateAuctionUseCase = Depends(get_create_auction_use_case),
+    _: User = Depends(get_current_user),
 ) -> AuctionSchema:
-    
-    auction = await usecase.execute(auction_schema)
+    auction = await usecase.execute(data)
     return AuctionSchema.model_validate(auction)
 
 
@@ -76,6 +57,7 @@ async def schedule_auction(
     auction_id: uuid.UUID,
     data: ScheduleAuctionSchema,
     usecase: ScheduleAuctionUseCase = Depends(get_schedule_auction_use_case),
+    _: User = Depends(get_current_user),
 ) -> AuctionSchema:
     auction = await usecase.execute(auction_id, data)
     return AuctionSchema.model_validate(auction)
@@ -86,6 +68,7 @@ async def cancel_auction(
     auction_id: uuid.UUID,
     data: CancelAuctionSchema,
     usecase: CancelAuctionUseCase = Depends(get_cancel_auction_use_case),
+    _: User = Depends(get_current_user),
 ) -> AuctionSchema:
     auction = await usecase.execute(
         id=auction_id,
@@ -94,10 +77,12 @@ async def cancel_auction(
     )
     return AuctionSchema.model_validate(auction)
 
+
 @router.patch("/{auction_id}/finish", status_code=status.HTTP_200_OK)
 async def finish_auction(
     auction_id: uuid.UUID,
     usecase: FinishAuctionUseCase = Depends(get_finish_auction_use_case),
+    _: User = Depends(get_current_user),
 ) -> AuctionSchema:
     auction = await usecase.execute(auction_id, current_date=datetime.now())
     return AuctionSchema.model_validate(auction)

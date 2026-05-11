@@ -2,7 +2,6 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database.session import get_db
 from app.modules.users.infrastructure.repository.users_repository import UserRepository
-from app.modules.users.application.usecases.create_user_usecase import CreateUserUseCase
 from app.modules.users.application.usecases.delete_user_usecase import DeleteUserUseCase
 from app.modules.users.application.usecases.get_user_by_id_usecase import (
     GetUserByIdUseCase,
@@ -17,12 +16,6 @@ def get_user_repository(
     session: AsyncSession = Depends(get_db),
 ) -> UserRepository:
     return UserRepository(session)
-
-
-def get_create_user_use_case(
-    repo: UserRepository = Depends(get_user_repository),
-) -> CreateUserUseCase:
-    return CreateUserUseCase(repo)
 
 
 def get_delete_user_use_case(

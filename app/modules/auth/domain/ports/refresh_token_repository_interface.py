@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from app.modules.auth.infrastructure.persistence.refresh_token_model import RefreshTokenModel
+from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
 
 
-class IRefreshRespository(ABC):
+class IRefreshTokenRepository(ABC):
     @abstractmethod
-    async def save(self, token: RefreshTokenModel) -> None:
+    async def save(self, token: RefreshTokenEntity) -> None:
         pass
     @abstractmethod
-    async def find_by_jti(self, jti: str) -> RefreshTokenModel | None:
+    async def find_by_jti(self, jti: str) -> RefreshTokenEntity | None:
         pass
     @abstractmethod
     async def revoke(self, jti: str) -> None:

@@ -15,16 +15,16 @@ class IJWTService(ABC):
 
     @abstractmethod
     def create_refresh_token(
-        self, 
+        self,
         subject: UUID,
         expires_delta: Optional[timedelta] = None
-    ) -> str:
-        pass    
-    
-    @abstractmethod
-    def decode_access_token(self, token: str) -> tuple[str, str]:
+    ) -> tuple[str, str]:
         pass
-    
+
     @abstractmethod
-    def decode_refresh_token(self, token: str) -> tuple[str, str]:
+    def decode_access_token(self, token: str) -> dict:
+        pass
+
+    @abstractmethod
+    def decode_refresh_token(self, token: str) -> dict:
         pass

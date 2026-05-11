@@ -14,6 +14,7 @@ from app.modules.auction.infrastructure.persistence.auction_model import Auction
 from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel  # noqa
 from app.modules.bidding.infrastructure.persistence.bidding_model import BiddingModel  # noqa
 from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel  # noqa
+from app.modules.auth.infrastructure.persistence.refresh_token_model import RefreshTokenModel  # noqa   
 
 
 config = context.config

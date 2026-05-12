@@ -27,17 +27,25 @@ services:
       - redis
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://auction_user:auction_password@postgres:5432/auction_db
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=minha_chave_super_secreta_pro_jwt
-      - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    env_file:
+      - .env
     volumes:
-      # Esse volume espelha o seu código para dentro do container em tempo real!
       - .:/app
     command: >
       bash -c "uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+  worker:
+    build: .
+    container_name: fastapi_auction_worker
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: >
+      uv run celery -A app.core.celery.celery_app worker --loglevel=info
 
 volumes:
   postgres_data:

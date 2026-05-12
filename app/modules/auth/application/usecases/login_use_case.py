@@ -1,4 +1,5 @@
 import uuid
+import hashlib
 from datetime import datetime, timedelta, timezone
 
 from app.modules.auth.domain.exceptions.auth_exceptions import InvalidCredentialsException
@@ -39,7 +40,7 @@ class LoginUseCase:
             id=uuid.uuid4(),
             jti=jti,
             user_id=user.id,
-            token_hash=self.password_service.hash_password(refresh_token),
+            token_hash=hashlib.sha256(refresh_token.encode()).hexdigest(),
             expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
         await self.refresh_token_repository.save(token_model)

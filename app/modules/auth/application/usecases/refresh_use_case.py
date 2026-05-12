@@ -1,10 +1,10 @@
 import uuid
+import hashlib
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
 from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
-from app.modules.auth.domain.ports.password_service_interface import IPasswordService
 from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
 from app.modules.auth.domain.exceptions.auth_exceptions import TokenRevokedException
 from app.core.config import settings
@@ -15,11 +15,9 @@ class RefreshTokenUseCase:
         self,
         refresh_token_repository: IRefreshTokenRepository,
         jwt_service: IJWTService,
-        password_service: IPasswordService,
     ):
         self.refresh_token_repository = refresh_token_repository
         self.jwt_service = jwt_service
-        self.password_service = password_service
 
     async def execute(self, refresh_token: str) -> dict:
         payload = self.jwt_service.decode_refresh_token(refresh_token)
@@ -40,7 +38,7 @@ class RefreshTokenUseCase:
             id=uuid.uuid4(),
             jti=new_jti,
             user_id=user_id,
-            token_hash=self.password_service.hash_password(new_refresh_token),
+            token_hash=hashlib.sha256(new_refresh_token.encode()).hexdigest(),
             expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
         await self.refresh_token_repository.save(token_model)

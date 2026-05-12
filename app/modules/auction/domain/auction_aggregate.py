@@ -207,15 +207,14 @@ class Auction:
 
         if diff_seconds <= 30:
             self._end_time = current_time + timedelta(seconds=60)
-
-        self.events.append(
-            AuctionExtendedEvent(
-                payload={
-                    "id": str(self.id),
-                    "end_time": self.end_time.isoformat() if self.end_time else "",
-                }
+            self.events.append(
+                AuctionExtendedEvent(
+                    payload={
+                        "id": str(self.id),
+                        "end_time": self.end_time.isoformat() if self.end_time else "",
+                    }
+                )
             )
-        )
 
     def pull_events(self) -> List:
         events = self.events.copy()

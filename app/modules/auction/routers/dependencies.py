@@ -1,14 +1,13 @@
-from fastapi import Depends
+from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database.session import get_db
+from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.auction.infrastructure.repository.auction_repository import (
     AuctionRepository,
 )
 from app.modules.auction.infrastructure.repository.auction_read_repository import (
     AuctionReadRepository,
 )
-from app.modules.auction.infrastructure.event_bus import DummyEventBus
-from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
 
 from app.modules.auction.application.usecases.create_auction_use_case import (
     CreateAuctionUseCase,
@@ -36,8 +35,8 @@ def get_auction_read_repository(
     return AuctionReadRepository(session)
 
 
-def get_event_bus() -> EventBusInterface:
-    return DummyEventBus()
+def get_event_bus(request: Request) -> EventBusInterface:
+    return request.app.state.event_bus
 
 
 def get_create_auction_use_case(

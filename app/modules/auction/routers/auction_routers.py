@@ -22,7 +22,7 @@ from app.modules.auction.application.usecases.finish_auction_use_case import Fin
 from app.core.auth.dependencies import get_current_user
 from app.modules.users.domain.users_aggregate import User
 
-router = APIRouter(prefix="/auction", tags=["Auction"])
+router = APIRouter(prefix="/auctions", tags=["Auction"])
 
 
 @router.get("", status_code=status.HTTP_200_OK)

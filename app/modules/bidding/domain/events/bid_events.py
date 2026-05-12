@@ -1,4 +1,4 @@
-from core.events.base_events import BaseDomainEvent
+from app.core.events.base_events import BaseDomainEvent
 
 
 class BidPlacedEvent(BaseDomainEvent):

@@ -1,4 +1,4 @@
-from core.exceptions.exceptions import DomainException
+from app.core.exceptions.exceptions import DomainException
 
 
 class InvalidBidPlaceException(DomainException):

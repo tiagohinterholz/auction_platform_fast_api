@@ -1,7 +1,6 @@
-from fastapi import Depends
+from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.bidding.domain.ports.event_bus_interface import EventBusInterface
-from app.modules.bidding.infrastructure.event_bus import DummyEventBus
+from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.bidding.infrastructure.repository.bidding_repository import BiddingRepository
 from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
 from app.core.database.session import get_db
@@ -24,8 +23,8 @@ def get_bid_read_repository(
     return BidReadRepository(session)
 
 
-def get_event_bus() -> EventBusInterface:
-    return DummyEventBus()
+def get_event_bus(request: Request) -> EventBusInterface:
+    return request.app.state.event_bus
 
 
 def get_place_bid_use_case(

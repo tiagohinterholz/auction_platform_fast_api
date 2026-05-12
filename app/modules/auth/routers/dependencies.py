@@ -50,7 +50,7 @@ def get_login_use_case(
 def get_refresh_use_case(
     refresh_token_repo: RefreshTokenRepository = Depends(get_refresh_token_repository),
 ) -> RefreshTokenUseCase:
-    return RefreshTokenUseCase(refresh_token_repo, _jwt_service, _password_service)
+    return RefreshTokenUseCase(refresh_token_repo, _jwt_service)
 
 
 def get_logout_use_case(

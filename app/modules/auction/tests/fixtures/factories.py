@@ -5,6 +5,7 @@ import pytest
 
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.infrastructure.persistence.auction_model import AuctionModel
+from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
 
 
 @pytest.fixture
@@ -26,11 +27,16 @@ def auction_factory(db_session, user_obj, faker):
     ):
         auctions = []
         for _ in range(count):
+            _title = title or faker.sentence()
+            _description = description or faker.text()
+            _status = status.value if status else AuctionStatus.CREATED.value
+            _user_id = user_id or user_obj.id
+
             auction = AuctionModel(
-                title=title or faker.sentence(),
-                description=description or faker.text(),
-                status=status.value if status else AuctionStatus.CREATED.value,
-                user_id=user_id or user_obj.id,
+                title=_title,
+                description=_description,
+                status=_status,
+                user_id=_user_id,
                 start_price=start_price,
                 minimum_increment=minimum_increment,
                 start_time=start_time,
@@ -40,8 +46,25 @@ def auction_factory(db_session, user_obj, faker):
                 **kwargs,
             )
             db_session.add(auction)
+            await db_session.flush()
+
+            read_model = AuctionReadModel(
+                id=auction.id,
+                title=_title,
+                description=_description,
+                status=_status,
+                user_id=_user_id,
+                start_price=start_price,
+                minimum_increment=minimum_increment,
+                start_time=start_time,
+                end_time=end_time,
+                reason=reason,
+                images=images,
+            )
+            db_session.add(read_model)
             auctions.append(auction)
+
         await db_session.commit()
 
-        return auctions if count > 1 else auctions[0]   
+        return auctions if count > 1 else auctions[0]
     return make_auction

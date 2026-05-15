@@ -13,3 +13,6 @@ format:
 
 test:
 	docker exec fastapi_auction_api uv run pytest -v
+
+collect:
+	docker exec fastapi_auction_api uv run pytest --collect-only -q

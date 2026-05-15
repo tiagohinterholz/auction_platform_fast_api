@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -15,7 +15,7 @@ async def auction_obj_created(auction_factory, user_obj):
 
 @pytest.fixture
 async def auction_obj_scheduled(auction_factory, user_obj):
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
     return await auction_factory(
         status=AuctionStatus.SCHEDULED,
         user_id=user_obj.id,
@@ -26,7 +26,7 @@ async def auction_obj_scheduled(auction_factory, user_obj):
 
 @pytest.fixture
 async def auction_obj_active(auction_factory, user_obj):
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
     return await auction_factory(
         status=AuctionStatus.ACTIVE,
         user_id=user_obj.id,
@@ -37,7 +37,7 @@ async def auction_obj_active(auction_factory, user_obj):
 
 @pytest.fixture
 async def auction_obj_finished(auction_factory, user_obj):
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
     return await auction_factory(
         status=AuctionStatus.FINISHED,
         user_id=user_obj.id,

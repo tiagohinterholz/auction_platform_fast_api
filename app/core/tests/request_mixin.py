@@ -3,14 +3,13 @@ from httpx import AsyncClient, Response
 
 class RequestMixin:
     base_url = "/api/v1"
-
-    def __init__(self, client: AsyncClient, token: str | None = None):
-        self.client = client
-        self.token = token
+    client: AsyncClient
+    token: str | None = None
 
     def _headers(self) -> dict:
-        if self.token:
-            return {"Authorization": f"Bearer {self.token}"}
+        token = getattr(self, "token", None)
+        if token:
+            return {"Authorization": f"Bearer {token}"}
         return {}
 
     async def get(self, path: str, **kwargs) -> Response:
@@ -26,10 +25,17 @@ class RequestMixin:
         return await self.client.delete(f"{self.base_url}{path}", headers=self._headers(), **kwargs)
 
     @classmethod
+    def create(cls, client: AsyncClient, token: str | None = None) -> "RequestMixin":
+        instance = object.__new__(RequestMixin)
+        instance.client = client
+        instance.token = token
+        return instance
+
+    @classmethod
     async def authenticated(cls, client: AsyncClient, email: str, password: str) -> "RequestMixin":
         response = await client.post(
             f"{cls.base_url}/auth/login",
             json={"email": email, "password": password},
         )
         token = response.json()["access_token"]
-        return cls(client, token)
+        return cls.create(client, token)

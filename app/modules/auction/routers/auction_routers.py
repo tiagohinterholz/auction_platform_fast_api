@@ -8,7 +8,6 @@ from app.modules.auction.routers.dependencies import (
     get_create_auction_use_case,
     get_schedule_auction_use_case,
     get_cancel_auction_use_case,
-    get_finish_auction_use_case,
 )
 from app.modules.auction.application.schemas.auction_schema import AuctionSchema
 from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
@@ -18,7 +17,6 @@ from app.modules.auction.application.schemas.cancel_auction_schema import Cancel
 from app.modules.auction.application.usecases.create_auction_use_case import CreateAuctionUseCase
 from app.modules.auction.application.usecases.schedule_auction_use_case import ScheduleAuctionUseCase
 from app.modules.auction.application.usecases.cancel_auction_use_case import CancelAuctionUseCase
-from app.modules.auction.application.usecases.finish_auction_use_case import FinishAuctionUseCase
 from app.core.auth.dependencies import get_current_user
 from app.modules.users.domain.users_aggregate import User
 
@@ -52,7 +50,7 @@ async def create_auction(
     return AuctionSchema.model_validate(auction)
 
 
-@router.patch("/{auction_id}/schedule", status_code=status.HTTP_200_OK)
+@router.patch("/{auction_id}/schedule", status_code=status.HTTP_202_ACCEPTED)
 async def schedule_auction(
     auction_id: uuid.UUID,
     data: ScheduleAuctionSchema,
@@ -63,7 +61,7 @@ async def schedule_auction(
     return AuctionSchema.model_validate(auction)
 
 
-@router.patch("/{auction_id}/cancel", status_code=status.HTTP_200_OK)
+@router.patch("/{auction_id}/cancel", status_code=status.HTTP_202_ACCEPTED)
 async def cancel_auction(
     auction_id: uuid.UUID,
     data: CancelAuctionSchema,
@@ -75,14 +73,4 @@ async def cancel_auction(
         current_date=datetime.now(),
         reason=data.reason,
     )
-    return AuctionSchema.model_validate(auction)
-
-
-@router.patch("/{auction_id}/finish", status_code=status.HTTP_200_OK)
-async def finish_auction(
-    auction_id: uuid.UUID,
-    usecase: FinishAuctionUseCase = Depends(get_finish_auction_use_case),
-    _: User = Depends(get_current_user),
-) -> AuctionSchema:
-    auction = await usecase.execute(auction_id, current_date=datetime.now())
     return AuctionSchema.model_validate(auction)

@@ -7,7 +7,7 @@ from app.core.locks.lock_interface import ILockService
 from app.modules.auction.domain.exceptions.auction_exceptions import AuctionNotFoundException
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.bidding.domain.bidding_aggregate import Bidding
-from app.modules.bidding.domain.exceptions.bidding_exceptions import InvalidBidPlaceException
+from app.modules.bidding.domain.exceptions.bidding_exceptions import InvalidBidPlaceException, AuctionBeingProcessedException
 
 
 
@@ -25,10 +25,11 @@ class PlaceBidUseCase:
         self.lock_manager = lock_manager
     
     async def execute(self, auction_id: UUID, user_id: UUID, amount: float) -> None:
+        lock_acquired = False
         try:
             lock_acquired = await self.lock_manager.acquire(f'auction:{auction_id}:lock', 2000)
             if not lock_acquired:
-                raise Exception("Auction is currently being processed. Please try again later.")
+                raise AuctionBeingProcessedException()
 
             auction = await self.auction_read_repository.get_by_id(str(auction_id))
             if not auction:

@@ -13,6 +13,6 @@ class AuctionSchema(BaseModel):
     minimum_increment: float
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
-    images: List[str] = []
+    images: List[str] | None = None
 
     model_config = ConfigDict(from_attributes=True)

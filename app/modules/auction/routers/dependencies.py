@@ -18,9 +18,6 @@ from app.modules.auction.application.usecases.schedule_auction_use_case import (
 from app.modules.auction.application.usecases.cancel_auction_use_case import (
     CancelAuctionUseCase,
 )
-from app.modules.auction.application.usecases.finish_auction_use_case import (
-    FinishAuctionUseCase,
-)
 
 
 def get_auction_repository(
@@ -58,10 +55,3 @@ def get_cancel_auction_use_case(
     bus: EventBusInterface = Depends(get_event_bus),
 ) -> CancelAuctionUseCase:
     return CancelAuctionUseCase(repo, bus)
-
-
-def get_finish_auction_use_case(
-    repo: AuctionRepository = Depends(get_auction_repository),
-    bus: EventBusInterface = Depends(get_event_bus),
-) -> FinishAuctionUseCase:
-    return FinishAuctionUseCase(repo, bus)

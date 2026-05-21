@@ -17,9 +17,9 @@ class CreateAuctionUseCase:
         self._repository = repository
         self._event_bus = event_bus
 
-    async def execute(self, data: CreateAuctionSchema) -> Auction:
+    async def execute(self, data: CreateAuctionSchema, user_id: uuid.UUID) -> Auction:
         auction = Auction.create(
-            user_id=uuid.UUID(data.user_id),
+            user_id=user_id,
             title=data.title,
             description=data.description or "",
             start_price=data.start_price,

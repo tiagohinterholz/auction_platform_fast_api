@@ -44,9 +44,9 @@ async def get_auction_by_id(
 async def create_auction(
     data: CreateAuctionSchema,
     usecase: CreateAuctionUseCase = Depends(get_create_auction_use_case),
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> AuctionSchema:
-    auction = await usecase.execute(data)
+    auction = await usecase.execute(data, user_id=current_user.id)
     return AuctionSchema.model_validate(auction)
 
 

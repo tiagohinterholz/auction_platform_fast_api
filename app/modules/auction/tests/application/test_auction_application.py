@@ -48,7 +48,6 @@ class TestCreateAuctionUseCase(AuctionUseCaseBase):
 
     async def test_saves_and_publishes(self):
         data = CreateAuctionSchema(
-            user_id=str(uuid.uuid4()),
             title="Leilão teste",
             description="Descrição",
             start_price=100.0,
@@ -57,7 +56,7 @@ class TestCreateAuctionUseCase(AuctionUseCaseBase):
             images=[],
         )
 
-        result = await self.use_case.execute(data)
+        result = await self.use_case.execute(data, user_id=uuid.uuid4())
 
         self.repo.save.assert_called_once()
         self.bus.publish.assert_called_once()

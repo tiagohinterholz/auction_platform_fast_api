@@ -1,6 +1,6 @@
 import asyncio
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.core.celery.celery_app import celery_app
 from app.core.database.session import AsyncSessionLocal
@@ -28,7 +28,7 @@ async def _start_auction(auction_id: str) -> None:
         event_bus.subscribe("AuctionStartedEvent", BiddingAuctionStartedHandler(bidding_repo).handle)
 
         use_case = StartAuctionUseCase(write_repo, event_bus)
-        await use_case.execute(uuid.UUID(auction_id), datetime.now())
+        await use_case.execute(uuid.UUID(auction_id), datetime.now(timezone.utc))
 
 
 async def _finish_auction(auction_id: str) -> None:
@@ -40,7 +40,7 @@ async def _finish_auction(auction_id: str) -> None:
         event_bus.subscribe("AuctionFinishedEvent", AuctionFinishedHandler(read_repo).handle)
 
         use_case = FinishAuctionUseCase(write_repo, event_bus)
-        await use_case.execute(uuid.UUID(auction_id), datetime.now())
+        await use_case.execute(uuid.UUID(auction_id), datetime.now(timezone.utc))
 
 
 @celery_app.task(name="start_auction")

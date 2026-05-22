@@ -16,6 +16,11 @@ class AuctionScheduledHandler:
         end_time = datetime.fromisoformat(event.payload["end_time"])
         now = datetime.now(timezone.utc)
 
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+        if end_time.tzinfo is None:
+            end_time = end_time.replace(tzinfo=timezone.utc)
+
         start_delay = max(0, int((start_time - now).total_seconds()))
         end_delay = max(0, int((end_time - now).total_seconds()))
 

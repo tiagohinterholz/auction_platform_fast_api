@@ -12,6 +12,9 @@ class JWTService(IJWTService):
         self,
         subject: UUID,
         expires_delta: Optional[timedelta] = None,
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+        role: Optional[list[str]] = None,
     ) -> str:
         expire = datetime.now(timezone.utc) + (
             expires_delta if expires_delta else timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -20,6 +23,9 @@ class JWTService(IJWTService):
             'sub': str(subject),
             'jti': str(uuid4()),
             'exp': expire,
+            'name': name,
+            'email': email,
+            'role': role,
         }
         return jwt.encode(payload, settings.JWT_ACCESS_SECRET, algorithm=settings.ALGORITHM)
 
@@ -28,6 +34,9 @@ class JWTService(IJWTService):
         self,
         subject: UUID,
         expires_delta: Optional[timedelta] = None,
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+        role: Optional[str] = None,
     ) -> tuple[str, str]:
         jti = str(uuid4())
         expire = datetime.now(timezone.utc) + (
@@ -37,6 +46,9 @@ class JWTService(IJWTService):
             'sub': str(subject),
             'jti': jti,
             'exp': expire,
+            'name': name,
+            'email': email,
+            'role': role,
         }
         token = jwt.encode(payload, settings.JWT_REFRESH_SECRET, algorithm=settings.ALGORITHM)
         return token, jti

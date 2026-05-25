@@ -31,8 +31,16 @@ class RefreshTokenUseCase:
 
         await self.refresh_token_repository.revoke(jti)
 
-        new_access_token = self.jwt_service.create_access_token(subject=user_id)
-        new_refresh_token, new_jti = self.jwt_service.create_refresh_token(subject=user_id)
+        name = payload.get("name")
+        email = payload.get("email")
+        role = payload.get("role")
+
+        new_access_token = self.jwt_service.create_access_token(
+            subject=user_id, name=name, email=email, role=role
+        )
+        new_refresh_token, new_jti = self.jwt_service.create_refresh_token(
+            subject=user_id, name=name, email=email, role=role
+        )
 
         token_model = RefreshTokenEntity(
             id=uuid.uuid4(),

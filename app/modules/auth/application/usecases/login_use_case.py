@@ -33,8 +33,12 @@ class LoginUseCase:
         if not self.password_service.verify_password(password, user.password_hash):
             raise InvalidCredentialsException()
 
-        access_token = self.jwt_service.create_access_token(subject=user.id)
-        refresh_token, jti = self.jwt_service.create_refresh_token(subject=user.id)
+        access_token = self.jwt_service.create_access_token(
+            subject=user.id, name=user.name, email=user.email, role=user.role
+        )
+        refresh_token, jti = self.jwt_service.create_refresh_token(
+            subject=user.id, name=user.name, email=user.email, role=user.role
+        )
 
         token_model = RefreshTokenEntity(
             id=uuid.uuid4(),

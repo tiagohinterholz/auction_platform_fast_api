@@ -9,7 +9,10 @@ class IJWTService(ABC):
     def create_access_token(
         self, 
         subject: UUID,
-        expires_delta: Optional[timedelta] = None
+        expires_delta: Optional[timedelta] = None,  
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+        role: Optional[str] = None
     ) -> str:
         pass
 
@@ -17,7 +20,10 @@ class IJWTService(ABC):
     def create_refresh_token(
         self,
         subject: UUID,
-        expires_delta: Optional[timedelta] = None
+        expires_delta: Optional[timedelta] = None,
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+        role: Optional[str] = None
     ) -> tuple[str, str]:
         pass
 

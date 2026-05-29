@@ -15,3 +15,7 @@ class IAuctionReadRepository(ABC):
     @abstractmethod
     async def get_by_id(self, id: str) -> AuctionReadModel | None:
         pass
+
+    @abstractmethod
+    async def get_by_user_id(self, user_id: str) -> Sequence[AuctionReadModel] | None:
+        pass

@@ -25,3 +25,8 @@ class AuctionReadRepository(IAuctionReadRepository):
         query = select(AuctionReadModel)
         result = await self.session.execute(query)
         return result.scalars().all()
+
+    async def get_by_user_id(self, user_id: str) -> Sequence[AuctionReadModel]:
+        query = select(AuctionReadModel).where(AuctionReadModel.user_id == user_id)
+        result = await self.session.execute(query)
+        return result.scalars().all()

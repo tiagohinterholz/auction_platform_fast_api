@@ -1,3 +1,5 @@
+import stat
+
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import List
@@ -30,6 +32,13 @@ async def get_all_auctions(
     auctions = await auction_repository.get_all()
     return [AuctionSchema.model_validate(auction) for auction in auctions]
 
+@router.get("/me", status_code=status.HTTP_200_OK)
+async def get_my_auctions(
+    auction_repository: AuctionReadRepository = Depends(get_auction_read_repository),
+    current_user: User = Depends(get_current_user),
+) -> List[AuctionSchema]:
+    auctions = await auction_repository.get_by_user_id(str(current_user.id))
+    return [AuctionSchema.model_validate(auction) for auction in auctions]
 
 @router.get("/{auction_id}", status_code=status.HTTP_200_OK)
 async def get_auction_by_id(

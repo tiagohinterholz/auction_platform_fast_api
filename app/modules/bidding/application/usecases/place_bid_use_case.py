@@ -15,6 +15,11 @@ from app.modules.bidding.domain.exceptions.bidding_exceptions import (
 from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
 from app.modules.bidding.domain.ports.event_bus_interface import EventBusInterface
 
+# Generous margin over the critical section's real cost (a couple of DB
+# round trips) so a slow-but-alive request never loses its lock mid-flight
+# to another bidder on the same auction.
+BID_LOCK_TTL_MS = 8000
+
 
 class PlaceBidUseCase:
     def __init__(
@@ -32,7 +37,9 @@ class PlaceBidUseCase:
     async def execute(self, auction_id: UUID, user_id: UUID, amount: Decimal) -> None:
         lock_acquired = False
         try:
-            lock_acquired = await self.lock_manager.acquire(f'auction:{auction_id}:lock', 2000)
+            lock_acquired = await self.lock_manager.acquire(
+                f'auction:{auction_id}:lock', BID_LOCK_TTL_MS
+            )
             if not lock_acquired:
                 raise AuctionBeingProcessedException()
 

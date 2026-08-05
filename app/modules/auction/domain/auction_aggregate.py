@@ -55,7 +55,6 @@ class Auction:
         description: str,
         start_price: float,
         minimum_increment: float,
-        status: AuctionStatus,
         images: list[str] | None = None,
     ) -> "Auction":
         if not title.strip():
@@ -66,8 +65,6 @@ class Auction:
             raise InvalidAuctionStartPriceException(start_price)
         if minimum_increment <= 0:
             raise InvalidAuctionminimumIncrementException(minimum_increment)
-        if status not in AuctionStatus:
-            raise InvalidAuctionStatusException(status)
 
         safe_images = images or []
 
@@ -77,7 +74,7 @@ class Auction:
             description=description,
             start_price=start_price,
             minimum_increment=minimum_increment,
-            status=status,
+            status=AuctionStatus.CREATED,
             images=safe_images,
         )
         auction.events.append(

@@ -1,4 +1,4 @@
-from app.modules.auction.domain.enums.auction_status import AuctionStatus
+
 from app.modules.auction.domain.events.auction_events import AuctionCreatedEvent
 from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
 from app.modules.auction.infrastructure.repository.auction_read_repository import (
@@ -19,6 +19,5 @@ class AuctionCreatedHandler:
             start_price=float(event.payload["start_price"]),
             minimum_increment=float(event.payload["minimum_increment"]),
             images=event.payload["images"],
-            status=AuctionStatus.CREATED.value,
         )
         await self.read_repository.save(auction)

@@ -4,7 +4,6 @@ from app.modules.auction.application.schemas.create_auction_schema import (
     CreateAuctionSchema,
 )
 from app.modules.auction.domain.auction_aggregate import Auction
-from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.domain.ports.auction_repository_interface import (
     IAuctionRepository,
 )
@@ -25,7 +24,6 @@ class CreateAuctionUseCase:
             description=data.description or "",
             start_price=data.start_price,
             minimum_increment=data.minimum_increment,
-            status=AuctionStatus(data.status),
             images=data.images,
         )
         await self._repository.save(auction)

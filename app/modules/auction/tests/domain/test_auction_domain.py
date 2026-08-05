@@ -31,7 +31,6 @@ def _base_create_kwargs(**overrides):
         "description": "Descrição válida do leilão.",
         "start_price": 100.0,
         "minimum_increment": 10.0,
-        "status": AuctionStatus.CREATED,
         **overrides,
     }
 
@@ -64,7 +63,6 @@ class TestAuctionAggregate:
             (_base_create_kwargs(description="   "), InvalidAuctionDescriptionException),
             (_base_create_kwargs(start_price=0), InvalidAuctionStartPriceException),
             (_base_create_kwargs(minimum_increment=0), InvalidAuctionminimumIncrementException),
-            (_base_create_kwargs(status="INVALIDO"), InvalidAuctionStatusException),
         ],
         ids=[
             "valid",
@@ -72,7 +70,6 @@ class TestAuctionAggregate:
             "empty_description",
             "zero_price",
             "zero_increment",
-            "invalid_status",
         ],
     )
     def test_auction_create(self, kwargs, expected_exception):

@@ -1,31 +1,40 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from app.core.config import settings
+from app.core.database.session import AsyncSessionLocal
+from app.core.events.in_memory_event_bus import InMemoryEventBus
 from app.core.exceptions.error_handlers import setup_exception_handlers
 from app.core.redis.client import create_redis_client
-from app.core.events.in_memory_event_bus import InMemoryEventBus
 from app.core.websockets.connection_manager import ConnectionManager
-from app.core.database.session import AsyncSessionLocal
-
+from app.modules.auction.application.handlers.bid_placed_handler import (
+    BidPlacedHandler as AuctionBidPlacedHandler,
+)
+from app.modules.auction.application.handlers.cancelled_auction_handler import (
+    AuctionCancelledHandler,
+)
 from app.modules.auction.application.handlers.created_auction_handler import AuctionCreatedHandler
-from app.modules.auction.application.handlers.scheduled_auction_handler import AuctionScheduledHandler
-from app.modules.auction.application.handlers.started_auction_handler import AuctionStartedHandler
 from app.modules.auction.application.handlers.finished_auction_handler import AuctionFinishedHandler
-from app.modules.auction.application.handlers.cancelled_auction_handler import AuctionCancelledHandler
-from app.modules.auction.application.handlers.bid_placed_handler import BidPlacedHandler as AuctionBidPlacedHandler
+from app.modules.auction.application.handlers.scheduled_auction_handler import (
+    AuctionScheduledHandler,
+)
+from app.modules.auction.application.handlers.started_auction_handler import AuctionStartedHandler
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
 from app.modules.auction.infrastructure.repository.auction_repository import AuctionRepository
-from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
-
-from app.modules.bidding.application.handlers.bid_placed_handler import BidPlacedHandler as BiddingBidPlacedHandler
-from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
-
-from app.modules.users.routers.users_router import router as users_router
 from app.modules.auction.routers.auction_routers import router as auction_router
-from app.modules.bidding.routers.bid_routers import router as bidding_router
 from app.modules.auth.routers.auth_router import router as auth_router
+from app.modules.bidding.application.handlers.bid_placed_handler import (
+    BidPlacedHandler as BiddingBidPlacedHandler,
+)
+from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
+from app.modules.bidding.routers.bid_routers import router as bidding_router
 from app.modules.notifications.routers.notification_router import setup_notifications
+from app.modules.users.routers.users_router import router as users_router
 
 event_bus = InMemoryEventBus()
 connection_manager = ConnectionManager()
@@ -101,7 +110,7 @@ app.include_router(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

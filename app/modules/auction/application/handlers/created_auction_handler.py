@@ -1,7 +1,9 @@
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.domain.events.auction_events import AuctionCreatedEvent
 from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
-from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
 
 
 class AuctionCreatedHandler:

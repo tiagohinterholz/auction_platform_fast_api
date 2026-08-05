@@ -1,11 +1,11 @@
-from typing import List, Callable
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 
 
 class EventBusInterface(ABC):
 
     @abstractmethod
-    async def publish(self, events: List) -> None:
+    async def publish(self, events: list) -> None:
         pass
 
     @abstractmethod

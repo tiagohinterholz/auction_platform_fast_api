@@ -1,6 +1,5 @@
-from datetime import datetime
-from typing import List
 import uuid
+from datetime import datetime
 
 from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
 from app.modules.bidding.domain.exceptions.bidding_exceptions import InvalidBidPlaceException
@@ -24,7 +23,7 @@ class Bidding:
         self._last_user_id = last_user_id
         self._last_amount = last_amount
         self._timestamp = timestamp or datetime.now()
-        self.events: List = []
+        self.events: list = []
     
     @classmethod
     def open(cls, auction_id: uuid.UUID, starting_price: float, minimum_increment: float) -> "Bidding":
@@ -61,7 +60,7 @@ class Bidding:
                 }
         ))
     
-    def pull_events(self) -> List:
+    def pull_events(self) -> list:
         events = self.events.copy()
         self.events.clear()
         return events

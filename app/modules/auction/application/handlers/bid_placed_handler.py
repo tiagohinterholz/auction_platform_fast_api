@@ -1,9 +1,11 @@
 from datetime import datetime
 
-from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
-from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
-from app.modules.auction.infrastructure.repository.auction_repository import AuctionRepository
 from app.core.events.event_bus_interface import EventBusInterface
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
+from app.modules.auction.infrastructure.repository.auction_repository import AuctionRepository
+from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
 
 
 class BidPlacedHandler:

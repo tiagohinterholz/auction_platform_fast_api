@@ -1,9 +1,10 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.modules.auction.domain.auction_aggregate import Auction
+from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.domain.ports.auction_repository_interface import IAuctionRepository
 from app.modules.auction.infrastructure.persistence.auction_model import AuctionModel
 
@@ -22,7 +23,7 @@ class AuctionRepository(IAuctionRepository):
             minimum_increment=model.minimum_increment,
             start_time=model.start_time,
             end_time=model.end_time,
-            status=model.status,
+            status=AuctionStatus(model.status),
             images=model.images or [],
         )
 
@@ -45,7 +46,7 @@ class AuctionRepository(IAuctionRepository):
             minimum_increment=auction.minimum_increment,
             start_time=auction.start_time,
             end_time=auction.end_time,
-            status=auction.status,
+            status=auction.status.value,
             images=auction.images,
         )
         await self.session.merge(auction_model)

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.modules.auction.domain.auction_aggregate import Auction
 
 

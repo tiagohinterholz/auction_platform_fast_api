@@ -1,4 +1,5 @@
 import bcrypt
+
 from app.modules.auth.domain.ports.password_service_interface import IPasswordService
 
 

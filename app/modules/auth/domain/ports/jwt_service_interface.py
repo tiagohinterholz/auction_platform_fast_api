@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from datetime import timedelta
-from typing import Optional
 from uuid import UUID
 
 
@@ -9,10 +8,10 @@ class IJWTService(ABC):
     def create_access_token(
         self, 
         subject: UUID,
-        expires_delta: Optional[timedelta] = None,  
-        name: Optional[str] = None,
-        email: Optional[str] = None,
-        role: Optional[str] = None
+        expires_delta: timedelta | None = None,  
+        name: str | None = None,
+        email: str | None = None,
+        role: str | None = None
     ) -> str:
         pass
 
@@ -20,10 +19,10 @@ class IJWTService(ABC):
     def create_refresh_token(
         self,
         subject: UUID,
-        expires_delta: Optional[timedelta] = None,
-        name: Optional[str] = None,
-        email: Optional[str] = None,
-        role: Optional[str] = None
+        expires_delta: timedelta | None = None,
+        name: str | None = None,
+        email: str | None = None,
+        role: str | None = None
     ) -> tuple[str, str]:
         pass
 

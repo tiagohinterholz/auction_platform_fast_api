@@ -1,13 +1,17 @@
 import pytest
 
-from app.modules.users.domain.users_aggregate import User
 from app.modules.users.domain.enums.user_role import UserRole
-from app.modules.users.domain.events.users_events import UserCreatedEvent, UserUpdatedEvent, UserDeletedEvent
-from app.modules.users.domain.exceptions.users_exceptions import (
-    InvalidUserNameException,
-    InvalidUserEmailException,
-    InvalidUserCPFException,
+from app.modules.users.domain.events.users_events import (
+    UserCreatedEvent,
+    UserDeletedEvent,
+    UserUpdatedEvent,
 )
+from app.modules.users.domain.exceptions.users_exceptions import (
+    InvalidUserCPFException,
+    InvalidUserEmailException,
+    InvalidUserNameException,
+)
+from app.modules.users.domain.users_aggregate import User
 
 
 def _base_create_kwargs(**overrides):

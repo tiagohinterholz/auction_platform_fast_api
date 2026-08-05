@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -27,7 +27,7 @@ def bidding_factory(db_session, auction_obj_active):
                 minimum_increment=minimum_increment,
                 last_user_id=last_user_id,
                 last_amount=last_amount,
-                timestamp=timestamp or datetime.now(timezone.utc),
+                timestamp=timestamp or datetime.now(UTC),
                 **kwargs,
             )
             db_session.add(bidding)

@@ -1,7 +1,9 @@
 
 from abc import ABC, abstractmethod
-from typing import Sequence
+from collections.abc import Sequence
+
 from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
+
 
 class IAuctionReadRepository(ABC):
     @abstractmethod

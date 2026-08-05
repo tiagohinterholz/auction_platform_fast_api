@@ -1,21 +1,23 @@
 import uuid
 from datetime import datetime, timedelta
-
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
+
 from app.core.events.event_bus_interface import EventBusInterface
-from app.modules.auction.domain.auction_aggregate import Auction
-from app.modules.auction.domain.enums.auction_status import AuctionStatus
-from app.modules.auction.domain.ports.auction_repository_interface import IAuctionRepository
-from app.modules.auction.domain.exceptions.auction_exceptions import InvalidAuctionIdException
-from app.modules.auction.application.usecases.create_auction_use_case import CreateAuctionUseCase
-from app.modules.auction.application.usecases.schedule_auction_use_case import ScheduleAuctionUseCase
-from app.modules.auction.application.usecases.start_auction_use_case import StartAuctionUseCase
-from app.modules.auction.application.usecases.finish_auction_use_case import FinishAuctionUseCase
-from app.modules.auction.application.usecases.cancel_auction_use_case import CancelAuctionUseCase
 from app.modules.auction.application.schemas.create_auction_schema import CreateAuctionSchema
 from app.modules.auction.application.schemas.schedule_auction_schema import ScheduleAuctionSchema
+from app.modules.auction.application.usecases.cancel_auction_use_case import CancelAuctionUseCase
+from app.modules.auction.application.usecases.create_auction_use_case import CreateAuctionUseCase
+from app.modules.auction.application.usecases.finish_auction_use_case import FinishAuctionUseCase
+from app.modules.auction.application.usecases.schedule_auction_use_case import (
+    ScheduleAuctionUseCase,
+)
+from app.modules.auction.application.usecases.start_auction_use_case import StartAuctionUseCase
+from app.modules.auction.domain.auction_aggregate import Auction
+from app.modules.auction.domain.enums.auction_status import AuctionStatus
+from app.modules.auction.domain.exceptions.auction_exceptions import InvalidAuctionIdException
+from app.modules.auction.domain.ports.auction_repository_interface import IAuctionRepository
 
 
 def _make_auction(status: AuctionStatus, start_time=None, end_time=None) -> Auction:

@@ -1,13 +1,13 @@
-import uuid
 import hashlib
-from datetime import datetime, timedelta, timezone
+import uuid
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
-from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
+from app.core.config import settings
 from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
 from app.modules.auth.domain.exceptions.auth_exceptions import TokenRevokedException
-from app.core.config import settings
+from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
+from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
 
 
 class RefreshTokenUseCase:
@@ -47,7 +47,7 @@ class RefreshTokenUseCase:
             jti=new_jti,
             user_id=user_id,
             token_hash=hashlib.sha256(new_refresh_token.encode()).hexdigest(),
-            expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+            expires_at=datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
         await self.refresh_token_repository.save(token_model)
 

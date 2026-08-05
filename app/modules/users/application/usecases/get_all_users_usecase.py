@@ -1,5 +1,5 @@
-from app.modules.users.domain.users_aggregate import User
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
+from app.modules.users.domain.users_aggregate import User
 
 
 class GetAllUsersUseCase:

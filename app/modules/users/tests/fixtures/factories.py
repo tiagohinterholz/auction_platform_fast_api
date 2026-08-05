@@ -1,8 +1,8 @@
 import bcrypt
 import pytest
 
-from app.modules.users.infrastructure.persistence.users_model import UserModel
 from app.modules.users.domain.enums.user_role import UserRole
+from app.modules.users.infrastructure.persistence.users_model import UserModel
 
 _default_hash = bcrypt.hashpw(b"Pass@123", bcrypt.gensalt()).decode()
 

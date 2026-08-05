@@ -1,10 +1,11 @@
 from abc import ABC
-from datetime import datetime, timezone
-from typing import Any, Dict
+from datetime import UTC, datetime
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
 class BaseDomainEvent(BaseModel, ABC):
     name: str
-    payload: Dict[str, Any]
-    occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    payload: dict[str, Any]
+    occurred_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     JWT_ACCESS_SECRET: str
     JWT_REFRESH_SECRET: str
     REFRESH_TOKEN_EXPIRE_DAYS: int
+    CORS_ORIGINS: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

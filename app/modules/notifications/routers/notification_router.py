@@ -1,15 +1,15 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.core.websockets.connection_manager import ConnectionManager
 from app.core.events.in_memory_event_bus import InMemoryEventBus
-from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
+from app.core.websockets.connection_manager import ConnectionManager
 from app.modules.auction.domain.events.auction_events import (
-    AuctionStartedEvent,
-    AuctionFinishedEvent,
     AuctionCancelledEvent,
-    AuctionScheduledEvent,
     AuctionExtendedEvent,
+    AuctionFinishedEvent,
+    AuctionScheduledEvent,
+    AuctionStartedEvent,
 )
+from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
 
 router = APIRouter(tags=["Notifications"])
 

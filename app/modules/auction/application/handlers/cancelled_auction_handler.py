@@ -1,6 +1,8 @@
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.domain.events.auction_events import AuctionCancelledEvent
-from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
 
 
 class AuctionCancelledHandler:

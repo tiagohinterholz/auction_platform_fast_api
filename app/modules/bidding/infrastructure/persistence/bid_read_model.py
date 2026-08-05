@@ -1,8 +1,9 @@
 import uuid
 
-from sqlalchemy import Column, UUID, Float, DateTime
+from sqlalchemy import UUID, Column, DateTime, Float
 
 from app.core.database.base import Base
+
 
 class BidReadModel(Base):
     __tablename__ = "bids_history"

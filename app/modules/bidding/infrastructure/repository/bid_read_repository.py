@@ -1,6 +1,7 @@
+from collections.abc import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import Sequence
 
 from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel
 

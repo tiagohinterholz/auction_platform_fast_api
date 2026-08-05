@@ -1,23 +1,23 @@
 import uuid
-from typing import List
 from datetime import datetime, timedelta
+
 from .enums.auction_status import AuctionStatus
+from .events.auction_events import (
+    AuctionCancelledEvent,
+    AuctionCreatedEvent,
+    AuctionExtendedEvent,
+    AuctionFinishedEvent,
+    AuctionScheduledEvent,
+    AuctionStartedEvent,
+)
 from .exceptions.auction_exceptions import (
-    InvalidAuctionTitleException,
     InvalidAuctionDescriptionException,
-    InvalidAuctionStartPriceException,
+    InvalidAuctionEndTimeException,
     InvalidAuctionminimumIncrementException,
+    InvalidAuctionStartPriceException,
     InvalidAuctionStartTimeException,
     InvalidAuctionStatusException,
-    InvalidAuctionEndTimeException,
-)
-from .events.auction_events import (
-    AuctionCreatedEvent,
-    AuctionStartedEvent,
-    AuctionExtendedEvent,
-    AuctionScheduledEvent,
-    AuctionFinishedEvent,
-    AuctionCancelledEvent,
+    InvalidAuctionTitleException,
 )
 
 
@@ -30,7 +30,7 @@ class Auction:
         start_price: float,
         minimum_increment: float,
         status: AuctionStatus,
-        images: List[str],
+        images: list[str],
         start_time: datetime | None = None,
         end_time: datetime | None = None,
         id: uuid.UUID | None = None,
@@ -45,7 +45,7 @@ class Auction:
         self._end_time = end_time
         self._status = status
         self._images = images
-        self.events: List = []
+        self.events: list = []
 
     @classmethod
     def create(
@@ -56,7 +56,7 @@ class Auction:
         start_price: float,
         minimum_increment: float,
         status: AuctionStatus,
-        images: List[str] | None = None,
+        images: list[str] | None = None,
     ) -> "Auction":
         if not title.strip():
             raise InvalidAuctionTitleException(title)
@@ -216,7 +216,7 @@ class Auction:
                 )
             )
 
-    def pull_events(self) -> List:
+    def pull_events(self) -> list:
         events = self.events.copy()
         self.events.clear()
         return events
@@ -258,5 +258,5 @@ class Auction:
         return self._status
 
     @property
-    def images(self) -> List[str]:
+    def images(self) -> list[str]:
         return self._images

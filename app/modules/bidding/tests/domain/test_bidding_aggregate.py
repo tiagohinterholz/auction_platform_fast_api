@@ -1,5 +1,7 @@
 import uuid
+
 import pytest
+
 from app.modules.bidding.domain.bidding_aggregate import Bidding
 from app.modules.bidding.domain.exceptions.bidding_exceptions import InvalidBidPlaceException
 

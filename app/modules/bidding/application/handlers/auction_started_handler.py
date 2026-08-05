@@ -1,8 +1,8 @@
 import uuid
 
 from app.modules.auction.domain.events.auction_events import AuctionStartedEvent
-from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
 from app.modules.bidding.domain.bidding_aggregate import Bidding
+from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
 
 
 class AuctionStartedHandler:

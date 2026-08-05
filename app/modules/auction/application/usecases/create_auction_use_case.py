@@ -1,13 +1,14 @@
 import uuid
-from app.modules.auction.domain.auction_aggregate import Auction
-from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
-from app.modules.auction.domain.ports.auction_repository_interface import (
-    IAuctionRepository,
-)
+
 from app.modules.auction.application.schemas.create_auction_schema import (
     CreateAuctionSchema,
 )
+from app.modules.auction.domain.auction_aggregate import Auction
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
+from app.modules.auction.domain.ports.auction_repository_interface import (
+    IAuctionRepository,
+)
+from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
 
 
 class CreateAuctionUseCase:

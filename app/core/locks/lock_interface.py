@@ -1,5 +1,6 @@
 from abc import ABC
 
+
 class ILockService(ABC):
     async def acquire(self, key: str, ttl_ms: int) -> bool: ...
     async def release(self, key: str) -> None: ...

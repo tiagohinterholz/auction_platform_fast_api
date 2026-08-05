@@ -1,7 +1,8 @@
 from fastapi import Depends
 from redis.asyncio import Redis
-from app.core.locks.redis_lock import RedisLockService
+
 from app.core.locks.lock_interface import ILockService
+from app.core.locks.redis_lock import RedisLockService
 from app.core.redis.client import get_redis_client
 
 

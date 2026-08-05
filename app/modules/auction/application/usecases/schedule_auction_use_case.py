@@ -1,15 +1,16 @@
 import uuid
-from app.modules.auction.domain.auction_aggregate import Auction
-from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
-from app.modules.auction.domain.ports.auction_repository_interface import (
-    IAuctionRepository,
-)
+
 from app.modules.auction.application.schemas.schedule_auction_schema import (
     ScheduleAuctionSchema,
 )
+from app.modules.auction.domain.auction_aggregate import Auction
 from app.modules.auction.domain.exceptions.auction_exceptions import (
     InvalidAuctionIdException,
 )
+from app.modules.auction.domain.ports.auction_repository_interface import (
+    IAuctionRepository,
+)
+from app.modules.auction.domain.ports.event_bus_interface import EventBusInterface
 
 
 class ScheduleAuctionUseCase:

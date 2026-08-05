@@ -1,12 +1,13 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from uuid import UUID
 
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+
 from app.core.security.jwt_service import JWTService
+from app.modules.users.domain.enums.user_role import UserRole
+from app.modules.users.domain.users_aggregate import User
 from app.modules.users.infrastructure.repository.users_repository import UserRepository
 from app.modules.users.routers.dependencies import get_user_repository
-from app.modules.users.domain.users_aggregate import User
-from app.modules.users.domain.enums.user_role import UserRole
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.modules.users.domain.users_aggregate import User
 
 

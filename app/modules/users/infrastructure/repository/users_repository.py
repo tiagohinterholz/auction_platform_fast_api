@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.modules.users.domain.users_aggregate import User
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
+from app.modules.users.domain.users_aggregate import User
 from app.modules.users.infrastructure.persistence.users_model import UserModel
 
 

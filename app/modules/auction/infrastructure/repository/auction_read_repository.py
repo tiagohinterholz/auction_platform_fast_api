@@ -1,10 +1,14 @@
+from collections.abc import Sequence
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import Sequence
+
+from app.modules.auction.domain.ports.auction_read_repository_interface import (
+    IAuctionReadRepository,
+)
 from app.modules.auction.infrastructure.persistence.auction_read_model import (
     AuctionReadModel,
 )
-from app.modules.auction.domain.ports.auction_read_repository_interface import IAuctionReadRepository
 
 
 class AuctionReadRepository(IAuctionReadRepository):

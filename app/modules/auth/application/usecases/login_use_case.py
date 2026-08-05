@@ -1,14 +1,14 @@
-import uuid
 import hashlib
-from datetime import datetime, timedelta, timezone
+import uuid
+from datetime import UTC, datetime, timedelta
 
+from app.core.config import settings
+from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
 from app.modules.auth.domain.exceptions.auth_exceptions import InvalidCredentialsException
 from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
 from app.modules.auth.domain.ports.password_service_interface import IPasswordService
 from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
-from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
-from app.core.config import settings
 
 
 class LoginUseCase:
@@ -45,7 +45,7 @@ class LoginUseCase:
             jti=jti,
             user_id=user.id,
             token_hash=hashlib.sha256(refresh_token.encode()).hexdigest(),
-            expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+            expires_at=datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
         await self.refresh_token_repository.save(token_model)
 

@@ -1,14 +1,17 @@
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.events.event_bus_interface import EventBusInterface
-from app.modules.bidding.infrastructure.repository.bidding_repository import BiddingRepository
-from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
+
 from app.core.database.session import get_db
-from app.modules.bidding.application.usecases.place_bid_use_case import PlaceBidUseCase
-from app.core.locks.redis_lock import RedisLockService
-from app.modules.auction.infrastructure.repository.auction_read_repository import AuctionReadRepository
-from app.modules.auction.routers.dependencies import get_auction_read_repository
+from app.core.events.event_bus_interface import EventBusInterface
 from app.core.locks.dependencies import get_lock_service
+from app.core.locks.redis_lock import RedisLockService
+from app.modules.auction.infrastructure.repository.auction_read_repository import (
+    AuctionReadRepository,
+)
+from app.modules.auction.routers.dependencies import get_auction_read_repository
+from app.modules.bidding.application.usecases.place_bid_use_case import PlaceBidUseCase
+from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
+from app.modules.bidding.infrastructure.repository.bidding_repository import BiddingRepository
 
 
 def get_bidding_repository(

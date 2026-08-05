@@ -1,9 +1,10 @@
+from datetime import UTC, datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from datetime import datetime, timezone
 
-from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
 from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
+from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
 from app.modules.auth.infrastructure.persistence.refresh_token_model import RefreshTokenModel
 
 
@@ -48,5 +49,5 @@ class RefreshTokenRepository(IRefreshTokenRepository):
         )
         model = result.scalars().first()
         if model:
-            model.revoked_at = datetime.now(timezone.utc)
+            model.revoked_at = datetime.now(UTC)
             await self.session.commit()

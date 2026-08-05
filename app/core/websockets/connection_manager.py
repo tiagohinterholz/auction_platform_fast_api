@@ -1,5 +1,6 @@
 from fastapi import WebSocket
 
+
 class ConnectionManager:
     def __init__(self):
         self._rooms: dict[str, list[WebSocket]] = {}

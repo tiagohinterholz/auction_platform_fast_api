@@ -1,19 +1,19 @@
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
 
-from app.modules.auth.application.usecases.login_use_case import LoginUseCase
-from app.modules.auth.application.usecases.register_use_case import RegisterUseCase
-from app.modules.auth.application.usecases.refresh_use_case import RefreshTokenUseCase
-from app.modules.auth.application.usecases.logout_use_case import LogoutUseCase
 from app.modules.auth.application.schemas.login_schema import LoginSchema
 from app.modules.auth.application.schemas.register_schema import RegisterSchema
 from app.modules.auth.application.schemas.token_schema import TokenSchema
+from app.modules.auth.application.usecases.login_use_case import LoginUseCase
+from app.modules.auth.application.usecases.logout_use_case import LogoutUseCase
+from app.modules.auth.application.usecases.refresh_use_case import RefreshTokenUseCase
+from app.modules.auth.application.usecases.register_use_case import RegisterUseCase
 from app.modules.auth.routers.dependencies import (
-    get_login_use_case,
-    get_register_use_case,
-    get_refresh_use_case,
-    get_logout_use_case,
     get_current_jti,
+    get_login_use_case,
+    get_logout_use_case,
+    get_refresh_use_case,
+    get_register_use_case,
 )
 
 

@@ -5,15 +5,22 @@ import pytest
 
 from app.modules.auction.domain.auction_aggregate import Auction
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
-from app.modules.auction.domain.events.auction_events import AuctionCreatedEvent, AuctionExtendedEvent, AuctionFinishedEvent, AuctionScheduledEvent, AuctionStartedEvent, AuctionCancelledEvent
+from app.modules.auction.domain.events.auction_events import (
+    AuctionCancelledEvent,
+    AuctionCreatedEvent,
+    AuctionExtendedEvent,
+    AuctionFinishedEvent,
+    AuctionScheduledEvent,
+    AuctionStartedEvent,
+)
 from app.modules.auction.domain.exceptions.auction_exceptions import (
-    InvalidAuctionEndTimeException,
-    InvalidAuctionStartTimeException,
-    InvalidAuctionTitleException,
     InvalidAuctionDescriptionException,
-    InvalidAuctionStartPriceException,
+    InvalidAuctionEndTimeException,
     InvalidAuctionminimumIncrementException,
+    InvalidAuctionStartPriceException,
+    InvalidAuctionStartTimeException,
     InvalidAuctionStatusException,
+    InvalidAuctionTitleException,
 )
 
 

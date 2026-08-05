@@ -1,8 +1,10 @@
 import uuid
-from app.core.database.base import Base
-from sqlalchemy import Column, Float, DateTime
+from datetime import UTC, datetime
+
+from sqlalchemy import Column, DateTime, Float
 from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime, timezone
+
+from app.core.database.base import Base
 
 
 class BiddingModel(Base):
@@ -14,6 +16,6 @@ class BiddingModel(Base):
     minimum_increment = Column(Float, nullable=False)
     last_user_id = Column(UUID(as_uuid=True), nullable=True)
     last_amount = Column(Float, nullable=True)
-    timestamp = Column(DateTime, default=datetime.now(timezone.utc))
+    timestamp = Column(DateTime, default=datetime.now(UTC))
 
     

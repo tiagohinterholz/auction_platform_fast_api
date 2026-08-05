@@ -1,8 +1,9 @@
-from jose import JWTError, jwt
-from app.core.config import settings
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
+
+from jose import JWTError, jwt
+
+from app.core.config import settings
 from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
 
 
@@ -11,12 +12,12 @@ class JWTService(IJWTService):
     def create_access_token(
         self,
         subject: UUID,
-        expires_delta: Optional[timedelta] = None,
-        name: Optional[str] = None,
-        email: Optional[str] = None,
-        role: Optional[list[str]] = None,
+        expires_delta: timedelta | None = None,
+        name: str | None = None,
+        email: str | None = None,
+        role: list[str] | None = None,
     ) -> str:
-        expire = datetime.now(timezone.utc) + (
+        expire = datetime.now(UTC) + (
             expires_delta if expires_delta else timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         )
         payload = {
@@ -33,13 +34,13 @@ class JWTService(IJWTService):
     def create_refresh_token(
         self,
         subject: UUID,
-        expires_delta: Optional[timedelta] = None,
-        name: Optional[str] = None,
-        email: Optional[str] = None,
-        role: Optional[str] = None,
+        expires_delta: timedelta | None = None,
+        name: str | None = None,
+        email: str | None = None,
+        role: str | None = None,
     ) -> tuple[str, str]:
         jti = str(uuid4())
-        expire = datetime.now(timezone.utc) + (
+        expire = datetime.now(UTC) + (
             expires_delta if expires_delta else timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
         )
         payload = {

@@ -1,14 +1,18 @@
 from uuid import UUID
 
-from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
-from app.modules.auction.domain.ports.auction_read_repository_interface import IAuctionReadRepository
-from app.modules.bidding.domain.ports.event_bus_interface import EventBusInterface 
 from app.core.locks.lock_interface import ILockService
-from app.modules.auction.domain.exceptions.auction_exceptions import AuctionNotFoundException
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
+from app.modules.auction.domain.exceptions.auction_exceptions import AuctionNotFoundException
+from app.modules.auction.domain.ports.auction_read_repository_interface import (
+    IAuctionReadRepository,
+)
 from app.modules.bidding.domain.bidding_aggregate import Bidding
-from app.modules.bidding.domain.exceptions.bidding_exceptions import InvalidBidPlaceException, AuctionBeingProcessedException
-
+from app.modules.bidding.domain.exceptions.bidding_exceptions import (
+    AuctionBeingProcessedException,
+    InvalidBidPlaceException,
+)
+from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
+from app.modules.bidding.domain.ports.event_bus_interface import EventBusInterface
 
 
 class PlaceBidUseCase:

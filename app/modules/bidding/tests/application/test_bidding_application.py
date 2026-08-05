@@ -1,14 +1,20 @@
 import uuid
+from unittest.mock import AsyncMock
 
 import pytest
-from unittest.mock import AsyncMock
+
 from app.core.events.event_bus_interface import EventBusInterface
 from app.core.locks.lock_interface import ILockService
-from app.modules.auction.domain.ports.auction_read_repository_interface import IAuctionReadRepository
-from app.modules.bidding.application.usecases.place_bid_use_case import PlaceBidUseCase
-from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
-from app.modules.bidding.domain.exceptions.bidding_exceptions import AuctionBeingProcessedException, InvalidBidPlaceException
 from app.modules.auction.domain.exceptions.auction_exceptions import AuctionNotFoundException
+from app.modules.auction.domain.ports.auction_read_repository_interface import (
+    IAuctionReadRepository,
+)
+from app.modules.bidding.application.usecases.place_bid_use_case import PlaceBidUseCase
+from app.modules.bidding.domain.exceptions.bidding_exceptions import (
+    AuctionBeingProcessedException,
+    InvalidBidPlaceException,
+)
+from app.modules.bidding.domain.ports.bidding_repository_interface import IBiddingRepository
 
 
 @pytest.mark.usefixtures("db_session")

@@ -1,5 +1,5 @@
-from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
 from app.modules.users.domain.exceptions.users_exceptions import UserNotFoundException
+from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
 
 
 class DeleteUserUseCase:
@@ -15,4 +15,4 @@ class DeleteUserUseCase:
         user.delete()
         await self.repository.save(user)
 
-        return None
+        return

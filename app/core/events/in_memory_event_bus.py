@@ -1,4 +1,5 @@
-from typing import List, Callable
+from collections.abc import Callable
+
 from app.core.events.event_bus_interface import EventBusInterface
 
 
@@ -11,7 +12,7 @@ class InMemoryEventBus(EventBusInterface):
         handlers.append(handler)
         self._handlers[event_name] = handlers
 
-    async def publish(self, events: List) -> None:
+    async def publish(self, events: list) -> None:
         for event in events:
             event_name = type(event).__name__
             handlers = self._handlers.get(event_name, [])

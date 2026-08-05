@@ -1,7 +1,8 @@
-from pydantic import BaseModel, ConfigDict
-from datetime import datetime
-from typing import List, Optional
 import uuid
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
+
 
 class AuctionSchema(BaseModel):
     id: uuid.UUID
@@ -11,8 +12,8 @@ class AuctionSchema(BaseModel):
     status: str
     start_price: float
     minimum_increment: float
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    images: List[str] | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    images: list[str] | None = None
 
     model_config = ConfigDict(from_attributes=True)

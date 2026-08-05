@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime
-from typing import Optional
-from sqlalchemy import String, Float, DateTime, JSON
+
+from sqlalchemy import JSON, DateTime, Float, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.core.database.base import Base
 
 
@@ -17,8 +18,8 @@ class AuctionReadModel(Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="CREATED")
     start_price: Mapped[float] = mapped_column(Float, nullable=False)
     minimum_increment: Mapped[float] = mapped_column(Float, nullable=False)
-    highest_bid: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    start_time: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    end_time: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    images: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    highest_bid: Mapped[float | None] = mapped_column(Float, nullable=True)
+    start_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    end_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    images: Mapped[list | None] = mapped_column(JSON, nullable=True)

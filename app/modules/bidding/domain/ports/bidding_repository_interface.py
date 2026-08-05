@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from app.modules.bidding.domain.bidding_aggregate import Bidding
+
 
 class IBiddingRepository(ABC):
     @abstractmethod

@@ -1,17 +1,17 @@
 import uuid
-
-import pytest
 from unittest.mock import AsyncMock
 
-from app.modules.users.domain.users_aggregate import User
-from app.modules.users.domain.enums.user_role import UserRole
-from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
-from app.modules.users.domain.exceptions.users_exceptions import UserNotFoundException
+import pytest
+
+from app.modules.users.application.schemas.update_user_schema import UpdateUserSchema
+from app.modules.users.application.usecases.delete_user_usecase import DeleteUserUseCase
 from app.modules.users.application.usecases.get_all_users_usecase import GetAllUsersUseCase
 from app.modules.users.application.usecases.get_user_by_id_usecase import GetUserByIdUseCase
 from app.modules.users.application.usecases.update_user_usecase import UpdateUserUseCase
-from app.modules.users.application.usecases.delete_user_usecase import DeleteUserUseCase
-from app.modules.users.application.schemas.update_user_schema import UpdateUserSchema
+from app.modules.users.domain.enums.user_role import UserRole
+from app.modules.users.domain.exceptions.users_exceptions import UserNotFoundException
+from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
+from app.modules.users.domain.users_aggregate import User
 
 
 def _make_user() -> User:

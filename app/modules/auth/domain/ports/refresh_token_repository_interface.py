@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
 
 

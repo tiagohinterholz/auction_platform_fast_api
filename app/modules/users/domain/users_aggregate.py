@@ -1,13 +1,12 @@
 import uuid
-from typing import List, Optional
 
-from .exceptions.users_exceptions import (
-    InvalidUserEmailException,
-    InvalidUserNameException,
-    InvalidUserCPFException,
-)
 from .enums.user_role import UserRole
 from .events.users_events import UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent
+from .exceptions.users_exceptions import (
+    InvalidUserCPFException,
+    InvalidUserEmailException,
+    InvalidUserNameException,
+)
 
 
 class User:
@@ -28,7 +27,7 @@ class User:
         self._password_hash = password_hash
         self._role = role
         self._is_active = is_active
-        self.events: List = []
+        self.events: list = []
 
     @classmethod
     def create(
@@ -67,7 +66,7 @@ class User:
         user.events = []
         return user
 
-    def update(self, name: Optional[str] = None, email: Optional[str] = None) -> None:
+    def update(self, name: str | None = None, email: str | None = None) -> None:
         if name is not None:
             self._name = name
 
@@ -98,7 +97,7 @@ class User:
             )
         )
 
-    def pull_events(self) -> List:
+    def pull_events(self) -> list:
         events = self.events.copy()
         self.events.clear()
         return events

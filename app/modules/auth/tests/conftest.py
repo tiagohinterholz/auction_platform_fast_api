@@ -1,1 +1,1 @@
-from app.modules.auth.tests.fixtures.payloads import register_payload  # noqa: F401
+from app.modules.auth.tests.fixtures.payloads import login_payload, register_payload  # noqa: F401

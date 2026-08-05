@@ -1,4 +1,4 @@
-from app.core.exceptions.exceptions import DomainException
+from app.core.exceptions.exceptions import DomainException, NotFoundException
 
 
 class InvalidUserNameException(DomainException):
@@ -18,6 +18,6 @@ class InvalidUserCPFException(DomainException):
         )
 
 
-class UserNotFoundException(DomainException):
+class UserNotFoundException(NotFoundException):
     def __init__(self, user_id: str):
         super().__init__(f"User not found with ID {user_id}.")

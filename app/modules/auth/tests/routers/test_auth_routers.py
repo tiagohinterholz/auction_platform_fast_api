@@ -11,13 +11,13 @@ class TestAuthRouters(RequestMixin):
         assert response.status_code == 201
         assert "access_token" in response.json()
 
-    async def test_register_duplicate_email_returns_400(self, client, register_payload):
+    async def test_register_duplicate_email_returns_401(self, client, register_payload):
         request = RequestMixin.create(client)
         await request.post("/auth/register", json=register_payload)
 
         response = await request.post("/auth/register", json=register_payload)
 
-        assert response.status_code == 400
+        assert response.status_code == 401
 
     async def test_register_duplicate_cpf_returns_409(self, client, register_payload):
         request = RequestMixin.create(client)
@@ -28,3 +28,19 @@ class TestAuthRouters(RequestMixin):
 
         assert response.status_code == 409
         assert response.json()["message"] == "CPF já cadastrado."
+
+    async def test_login_returns_200(self, client, register_payload, login_payload):
+        request = RequestMixin.create(client)
+        await request.post("/auth/register", json=register_payload)
+
+        response = await request.post("/auth/login", json=login_payload)
+
+        assert response.status_code == 200
+        assert "access_token" in response.json()
+
+    async def test_login_invalid_credentials_returns_401(self, client, login_payload):
+        request = RequestMixin.create(client)
+
+        response = await request.post("/auth/login", json=login_payload)
+
+        assert response.status_code == 401

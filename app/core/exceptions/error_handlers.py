@@ -30,7 +30,7 @@ def setup_exception_handlers(app: FastAPI):
     @app.exception_handler(DomainException)
     async def global_domain_exception_handler(request: Request, exc: DomainException):
         return JSONResponse(
-            status_code=400,
+            status_code=exc.status_code,
             content={"message": exc.message, "error_type": exc.__class__.__name__},
         )
 

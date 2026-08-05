@@ -1,8 +1,10 @@
+import uuid
+
 from app.core.tests.request_mixin import RequestMixin
 
 
 class TestAuctionRouters(RequestMixin):
-    
+
     async def test_create_auction_returns_201(self, client, user_obj, create_auction_payload):
         request_auth = await self.authenticated(client, user_obj.email, "Pass@123")
         response = await request_auth.post(
@@ -45,3 +47,13 @@ class TestAuctionRouters(RequestMixin):
         request = RequestMixin.create(client)
         response = await request.post("/auctions", json=create_auction_payload)
         assert response.status_code == 401
+
+    async def test_schedule_nonexistent_auction_returns_404(
+        self, client, user_obj, schedule_auction_payload
+    ):
+        request_auth = await self.authenticated(client, user_obj.email, "Pass@123")
+        response = await request_auth.patch(
+            f"/auctions/{uuid.uuid4()}/schedule",
+            json=schedule_auction_payload,
+        )
+        assert response.status_code == 404

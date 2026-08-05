@@ -1,16 +1,16 @@
-from app.core.exceptions.exceptions import DomainException
+from app.core.exceptions.exceptions import UnauthorizedException
 
 
-class InvalidCredentialsException(DomainException):
+class InvalidCredentialsException(UnauthorizedException):
     def __init__(self):
         super().__init__("Invalid credentials")
 
 
-class TokenExpiredException(DomainException):
+class TokenExpiredException(UnauthorizedException):
     def __init__(self):
         super().__init__("Token expired.")
 
 
-class TokenRevokedException(DomainException):
+class TokenRevokedException(UnauthorizedException):
     def __init__(self):
         super().__init__("Token revoked.")

@@ -9,3 +9,11 @@ def register_payload():
         "cpf": "12345678901",
         "password": "Pass@123",
     }
+
+
+@pytest.fixture
+def login_payload():
+    return {
+        "email": "joao@example.com",
+        "password": "Pass@123",
+    }

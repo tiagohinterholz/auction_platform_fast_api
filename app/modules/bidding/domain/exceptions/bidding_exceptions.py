@@ -1,4 +1,4 @@
-from app.core.exceptions.exceptions import DomainException
+from app.core.exceptions.exceptions import ConflictException, DomainException
 
 
 class InvalidBidPlaceException(DomainException):
@@ -6,6 +6,6 @@ class InvalidBidPlaceException(DomainException):
         super().__init__(message)
 
 
-class AuctionBeingProcessedException(DomainException):
+class AuctionBeingProcessedException(ConflictException):
     def __init__(self):
         super().__init__("Auction is currently being processed. Please try again later.")

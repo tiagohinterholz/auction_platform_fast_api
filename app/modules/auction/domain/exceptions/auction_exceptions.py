@@ -1,4 +1,4 @@
-from app.core.exceptions.exceptions import DomainException
+from app.core.exceptions.exceptions import ConflictException, DomainException, NotFoundException
 
 
 class InvalidAuctionTitleException(DomainException):
@@ -6,7 +6,7 @@ class InvalidAuctionTitleException(DomainException):
         super().__init__(f"Invalid auction title: {title}")
 
 
-class InvalidAuctionIdException(DomainException):
+class InvalidAuctionIdException(NotFoundException):
     def __init__(self, id: str):
         super().__init__(f"Invalid auction id: {id}")
 
@@ -36,11 +36,11 @@ class InvalidAuctionStartTimeException(DomainException):
         super().__init__(f"Invalid auction start time: {start_time}")
 
 
-class InvalidAuctionStatusException(DomainException):
+class InvalidAuctionStatusException(ConflictException):
     def __init__(self, status: str):
         super().__init__(f"Invalid auction status: {status}")
 
 
-class AuctionNotFoundException(DomainException):
+class AuctionNotFoundException(NotFoundException):
     def __init__(self, auction_id: str):
         super().__init__(f"Auction with id {auction_id} not found.")

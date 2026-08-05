@@ -23,3 +23,6 @@ settings.json
 #IA
 .codex
 AGENTS.md
+
+# Notas pessoais de bugs (não publicar)
+.bugs.md

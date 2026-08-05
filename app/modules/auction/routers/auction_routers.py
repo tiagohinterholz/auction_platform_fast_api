@@ -14,6 +14,7 @@ from app.modules.auction.application.usecases.create_auction_use_case import Cre
 from app.modules.auction.application.usecases.schedule_auction_use_case import (
     ScheduleAuctionUseCase,
 )
+from app.modules.auction.domain.exceptions.auction_exceptions import InvalidAuctionIdException
 from app.modules.auction.infrastructure.repository.auction_read_repository import (
     AuctionReadRepository,
 )
@@ -49,6 +50,9 @@ async def get_auction_by_id(
     auction_repository: AuctionReadRepository = Depends(get_auction_read_repository),
 ) -> AuctionSchema:
     auction = await auction_repository.get_by_id(str(auction_id))
+    if not auction:
+        raise InvalidAuctionIdException(f"Auction with id {auction_id} not found.")
+    
     return AuctionSchema.model_validate(auction)
 
 

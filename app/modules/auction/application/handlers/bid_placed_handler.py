@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.auction.infrastructure.repository.auction_read_repository import (
@@ -31,7 +32,7 @@ class BidPlacedHandler:
 
         current_auction = await self.read_repository.get_by_id(auction_id)
         if current_auction:
-            current_auction.highest_bid = float(event.payload["amount"])
+            current_auction.highest_bid = Decimal(event.payload["amount"])
             current_auction.end_time = auction.end_time
             await self.read_repository.save(current_auction)
 

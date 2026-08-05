@@ -1,5 +1,7 @@
+from decimal import Decimal
+
 from pydantic import BaseModel, Field
 
 
 class CreateBidSchema(BaseModel):
-    amount: float = Field(..., gt=0)
+    amount: Decimal = Field(..., gt=0)

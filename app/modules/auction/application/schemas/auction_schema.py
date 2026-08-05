@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -10,8 +11,8 @@ class AuctionSchema(BaseModel):
     title: str
     description: str
     status: str
-    start_price: float
-    minimum_increment: float
+    start_price: Decimal
+    minimum_increment: Decimal
     start_time: datetime | None = None
     end_time: datetime | None = None
     images: list[str] | None = None

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+from decimal import Decimal
 from unittest.mock import AsyncMock
 
 import pytest
@@ -25,8 +26,8 @@ def _make_auction(status: AuctionStatus, start_time=None, end_time=None) -> Auct
         user_id=uuid.uuid4(),
         title="Leilão teste",
         description="Descrição válida",
-        start_price=100.0,
-        minimum_increment=10.0,
+        start_price=Decimal("100.0"),
+        minimum_increment=Decimal("10.0"),
         status=status,
         images=[],
         start_time=start_time,

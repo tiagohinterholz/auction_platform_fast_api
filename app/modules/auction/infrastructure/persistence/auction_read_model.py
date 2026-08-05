@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
-from sqlalchemy import JSON, DateTime, Float, String
+from sqlalchemy import JSON, DateTime, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,9 +17,9 @@ class AuctionReadModel(Base):
     description: Mapped[str] = mapped_column(String(255), nullable=False)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="CREATED")
-    start_price: Mapped[float] = mapped_column(Float, nullable=False)
-    minimum_increment: Mapped[float] = mapped_column(Float, nullable=False)
-    highest_bid: Mapped[float | None] = mapped_column(Float, nullable=True)
+    start_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    minimum_increment: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    highest_bid: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
     start_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     end_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     reason: Mapped[str | None] = mapped_column(String(255), nullable=True)

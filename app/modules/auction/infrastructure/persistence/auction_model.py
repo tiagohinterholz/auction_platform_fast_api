@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import JSON, Column, DateTime, Float, String
+from sqlalchemy import JSON, Column, DateTime, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database.base import Base
@@ -14,8 +14,8 @@ class AuctionModel(Base):
     description = Column(String(255), nullable=False)
     title = Column(String(100), nullable=False)
     status = Column(String(50), nullable=False, default="CREATED")
-    start_price = Column(Float, nullable=False)
-    minimum_increment = Column(Float, nullable=False)
+    start_price = Column(Numeric(12, 2), nullable=False)
+    minimum_increment = Column(Numeric(12, 2), nullable=False)
     start_time = Column(DateTime, nullable=True)
     end_time = Column(DateTime, nullable=True)
     reason = Column(String(255), nullable=True)

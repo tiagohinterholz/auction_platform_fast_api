@@ -1,3 +1,4 @@
+from decimal import Decimal
 from uuid import UUID
 
 from app.core.locks.lock_interface import ILockService
@@ -28,7 +29,7 @@ class PlaceBidUseCase:
         self.event_bus = event_bus
         self.lock_manager = lock_manager
     
-    async def execute(self, auction_id: UUID, user_id: UUID, amount: float) -> None:
+    async def execute(self, auction_id: UUID, user_id: UUID, amount: Decimal) -> None:
         lock_acquired = False
         try:
             lock_acquired = await self.lock_manager.acquire(f'auction:{auction_id}:lock', 2000)

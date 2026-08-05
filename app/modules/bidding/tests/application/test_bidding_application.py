@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from unittest.mock import AsyncMock
 
 import pytest
@@ -38,7 +39,7 @@ class TestBiddingApplication:
         self.auction_repo.get_by_id.return_value = auction_obj_active
         self.bidding_repo.find_by_auction_id.return_value = None
 
-        await self.use_case.execute(auction_obj_active.id, user_obj.id, 150.0)
+        await self.use_case.execute(auction_obj_active.id, user_obj.id, Decimal("150.0"))
 
         self.bidding_repo.save.assert_called_once()
     
@@ -46,7 +47,7 @@ class TestBiddingApplication:
         self.lock.acquire.return_value = False
 
         with pytest.raises(AuctionBeingProcessedException):
-            await self.use_case.execute(auction_obj_active.id, user_obj.id, 150.0)
+            await self.use_case.execute(auction_obj_active.id, user_obj.id, Decimal("150.0"))
 
         self.bidding_repo.save.assert_not_called()
 
@@ -55,7 +56,7 @@ class TestBiddingApplication:
         self.auction_repo.get_by_id.return_value = None
 
         with pytest.raises(AuctionNotFoundException):
-            await self.use_case.execute(uuid.uuid4(), user_obj.id, 150.0)
+            await self.use_case.execute(uuid.uuid4(), user_obj.id, Decimal("150.0"))
 
         self.bidding_repo.save.assert_not_called()
     
@@ -64,6 +65,6 @@ class TestBiddingApplication:
         self.auction_repo.get_by_id.return_value = auction_obj_created
 
         with pytest.raises(InvalidBidPlaceException):
-            await self.use_case.execute(auction_obj_created.id, user_obj.id, 150.0)
+            await self.use_case.execute(auction_obj_created.id, user_obj.id, Decimal("150.0"))
 
         self.bidding_repo.save.assert_not_called()

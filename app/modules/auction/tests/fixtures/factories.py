@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 import pytest
 
@@ -16,8 +17,8 @@ def auction_factory(db_session, user_obj, faker):
         description: str | None = None,
         status: AuctionStatus | None = None,
         user_id: uuid.UUID | None = None,
-        start_price: float = 100.0,
-        minimum_increment: float = 10.0,
+        start_price: Decimal = Decimal("100.0"),
+        minimum_increment: Decimal = Decimal("10.0"),
         start_time: datetime | None = None,
         end_time: datetime | None = None,
         reason: str | None = None,

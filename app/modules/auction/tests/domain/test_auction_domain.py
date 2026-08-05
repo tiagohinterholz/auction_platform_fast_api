@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 import pytest
 
@@ -29,8 +30,8 @@ def _base_create_kwargs(**overrides):
         "user_id": uuid.uuid4(),
         "title": "Leilão válido",
         "description": "Descrição válida do leilão.",
-        "start_price": 100.0,
-        "minimum_increment": 10.0,
+        "start_price": Decimal("100.0"),
+        "minimum_increment": Decimal("10.0"),
         **overrides,
     }
 
@@ -44,8 +45,8 @@ def _make_auction(
         user_id=uuid.uuid4(),
         title="Leilão válido",
         description="Descrição válida do leilão.",
-        start_price=100.0,
-        minimum_increment=10.0,
+        start_price=Decimal("100.0"),
+        minimum_increment=Decimal("10.0"),
         status=status,
         images=[],
         start_time=start_time,

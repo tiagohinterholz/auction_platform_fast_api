@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from app.modules.auction.application.tasks.auction_tasks import (
     finish_auction_task,
@@ -47,6 +48,6 @@ class AuctionScheduledHandler:
         current_auction.status = AuctionStatus.SCHEDULED.value
         current_auction.start_time = start_time
         current_auction.end_time = end_time
-        current_auction.highest_bid = float(event.payload["starting_price"])
-        current_auction.minimum_increment = float(event.payload["minimum_increment"])
+        current_auction.highest_bid = Decimal(event.payload["starting_price"])
+        current_auction.minimum_increment = Decimal(event.payload["minimum_increment"])
         await self.read_repository.save(current_auction)

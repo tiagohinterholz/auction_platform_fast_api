@@ -1,5 +1,6 @@
 import uuid
 from datetime import UTC, datetime
+from decimal import Decimal
 
 import pytest
 
@@ -11,10 +12,10 @@ def bidding_factory(db_session, auction_obj_active):
     async def make_bidding(
         *,
         auction_id: uuid.UUID | None = None,
-        current_price: float = 100.0,
-        minimum_increment: float = 10.0,
+        current_price: Decimal = Decimal("100.0"),
+        minimum_increment: Decimal = Decimal("10.0"),
         last_user_id: uuid.UUID | None = None,
-        last_amount: float | None = None,
+        last_amount: Decimal | None = None,
         timestamp: datetime | None = None,
         count: int = 1,
         **kwargs,

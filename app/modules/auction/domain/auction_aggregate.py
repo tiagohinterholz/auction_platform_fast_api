@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from .enums.auction_status import AuctionStatus
 from .events.auction_events import (
@@ -27,8 +28,8 @@ class Auction:
         user_id: uuid.UUID,
         title: str,
         description: str,
-        start_price: float,
-        minimum_increment: float,
+        start_price: Decimal,
+        minimum_increment: Decimal,
         status: AuctionStatus,
         images: list[str],
         start_time: datetime | None = None,
@@ -53,8 +54,8 @@ class Auction:
         user_id: uuid.UUID,
         title: str,
         description: str,
-        start_price: float,
-        minimum_increment: float,
+        start_price: Decimal,
+        minimum_increment: Decimal,
         images: list[str] | None = None,
     ) -> "Auction":
         if not title.strip():
@@ -235,11 +236,11 @@ class Auction:
         return self._description
 
     @property
-    def start_price(self) -> float:
+    def start_price(self) -> Decimal:
         return self._start_price
 
     @property
-    def minimum_increment(self) -> float:
+    def minimum_increment(self) -> Decimal:
         return self._minimum_increment
 
     @property

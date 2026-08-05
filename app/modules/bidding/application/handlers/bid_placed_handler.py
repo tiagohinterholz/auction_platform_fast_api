@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
 from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel
@@ -15,7 +16,7 @@ class BidPlacedHandler:
             id=uuid.uuid4(),
             auction_id=uuid.UUID(str(event.payload["auction_id"])),
             user_id=uuid.UUID(str(event.payload["user_id"])),
-            amount=event.payload["amount"],
+            amount=Decimal(event.payload["amount"]),
             timestamp=datetime.now(),
         )
         await self.read_repository.save(model)

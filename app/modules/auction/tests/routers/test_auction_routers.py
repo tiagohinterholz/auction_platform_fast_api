@@ -42,7 +42,12 @@ class TestAuctionRouters(RequestMixin):
         request = RequestMixin.create(client)
         response = await request.get(f"/auctions/{auction_obj_created.id}")
         assert response.status_code == 200
-    
+
+    async def test_get_auction_by_id_returns_404_when_not_found(self, client):
+        request = RequestMixin.create(client)
+        response = await request.get(f"/auctions/{uuid.uuid4()}")
+        assert response.status_code == 404
+
     async def test_create_auction_returns_401_when_unauthenticated(self, client, create_auction_payload):
         request = RequestMixin.create(client)
         response = await request.post("/auctions", json=create_auction_payload)

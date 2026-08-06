@@ -45,6 +45,30 @@ class TestAuthRouters(RequestMixin):
 
         assert response.status_code == 401
 
+    async def test_refresh_returns_200_with_new_tokens(self, client, register_payload):
+        request = RequestMixin.create(client)
+        register_response = await request.post("/auth/register", json=register_payload)
+        old_tokens = register_response.json()
+
+        response = await request.post(
+            "/auth/refresh", json={"refresh_token": old_tokens["refresh_token"]}
+        )
+
+        assert response.status_code == 200
+        new_tokens = response.json()
+        assert new_tokens["access_token"] != old_tokens["access_token"]
+        assert new_tokens["refresh_token"] != old_tokens["refresh_token"]
+
+    async def test_refresh_rejects_an_already_used_refresh_token(self, client, register_payload):
+        request = RequestMixin.create(client)
+        register_response = await request.post("/auth/register", json=register_payload)
+        refresh_token = register_response.json()["refresh_token"]
+        await request.post("/auth/refresh", json={"refresh_token": refresh_token})
+
+        response = await request.post("/auth/refresh", json={"refresh_token": refresh_token})
+
+        assert response.status_code == 401
+
     async def test_logout_returns_204_and_revokes_the_refresh_token(self, client, register_payload):
         request = RequestMixin.create(client)
         register_response = await request.post("/auth/register", json=register_payload)

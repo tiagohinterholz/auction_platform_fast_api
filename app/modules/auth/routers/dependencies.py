@@ -1,6 +1,5 @@
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database.session import get_db
@@ -15,8 +14,6 @@ from app.modules.auth.infrastructure.repository.refresh_token_repository import 
 )
 from app.modules.users.infrastructure.repository.users_repository import UserRepository
 from app.modules.users.routers.dependencies import get_user_repository
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 _jwt_service = JWTService()
 _password_service = PasswordService()
@@ -59,18 +56,4 @@ def get_refresh_use_case(
 def get_logout_use_case(
     refresh_token_repo: RefreshTokenRepository = Depends(get_refresh_token_repository),
 ) -> LogoutUseCase:
-    return LogoutUseCase(refresh_token_repo)
-
-
-def get_current_jti(
-    token: str = Depends(oauth2_scheme),
-) -> str:
-    try:
-        payload = _jwt_service.decode_access_token(token)
-        return payload["jti"]
-    except (ValueError, KeyError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    return LogoutUseCase(refresh_token_repo, _jwt_service)

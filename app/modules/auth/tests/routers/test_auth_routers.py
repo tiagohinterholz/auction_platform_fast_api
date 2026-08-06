@@ -44,3 +44,26 @@ class TestAuthRouters(RequestMixin):
         response = await request.post("/auth/login", json=login_payload)
 
         assert response.status_code == 401
+
+    async def test_logout_returns_204_and_revokes_the_refresh_token(self, client, register_payload):
+        request = RequestMixin.create(client)
+        register_response = await request.post("/auth/register", json=register_payload)
+        tokens = register_response.json()
+        authenticated = RequestMixin.create(client, token=tokens["access_token"])
+
+        logout_response = await authenticated.post(
+            "/auth/logout", json={"refresh_token": tokens["refresh_token"]}
+        )
+        assert logout_response.status_code == 204
+
+        refresh_response = await request.post(
+            "/auth/refresh", json={"refresh_token": tokens["refresh_token"]}
+        )
+        assert refresh_response.status_code == 401
+
+    async def test_logout_returns_401_when_unauthenticated(self, client):
+        request = RequestMixin.create(client)
+
+        response = await request.post("/auth/logout", json={"refresh_token": "irrelevant"})
+
+        assert response.status_code == 401

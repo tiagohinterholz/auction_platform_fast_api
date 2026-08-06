@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
 
+from app.core.auth.dependencies import get_current_user
 from app.modules.auth.application.schemas.login_schema import LoginSchema
 from app.modules.auth.application.schemas.register_schema import RegisterSchema
 from app.modules.auth.application.schemas.token_schema import TokenSchema
@@ -9,12 +10,12 @@ from app.modules.auth.application.usecases.logout_use_case import LogoutUseCase
 from app.modules.auth.application.usecases.refresh_use_case import RefreshTokenUseCase
 from app.modules.auth.application.usecases.register_use_case import RegisterUseCase
 from app.modules.auth.routers.dependencies import (
-    get_current_jti,
     get_login_use_case,
     get_logout_use_case,
     get_refresh_use_case,
     get_register_use_case,
 )
+from app.modules.users.domain.users_aggregate import User
 
 
 class RefreshRequest(BaseModel):
@@ -58,7 +59,8 @@ async def refresh_token(
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
-    jti: str = Depends(get_current_jti),
+    data: RefreshRequest,
     use_case: LogoutUseCase = Depends(get_logout_use_case),
+    _: User = Depends(get_current_user),
 ) -> None:
-    await use_case.execute(jti=jti)
+    await use_case.execute(refresh_token=data.refresh_token)

@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from app.core.config import settings
-from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
+from app.modules.auth.domain.entities.refresh_token_entity import RefreshTokenEntity
 from app.modules.auth.domain.exceptions.auth_exceptions import TokenRevokedException
 from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
 from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository

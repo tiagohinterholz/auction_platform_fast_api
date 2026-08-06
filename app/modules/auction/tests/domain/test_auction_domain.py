@@ -62,14 +62,16 @@ class TestAuctionAggregate:
             (_base_create_kwargs(), None),
             (_base_create_kwargs(title="   "), InvalidAuctionTitleException),
             (_base_create_kwargs(description="   "), InvalidAuctionDescriptionException),
-            (_base_create_kwargs(start_price=0), InvalidAuctionStartPriceException),
+            (_base_create_kwargs(start_price=Decimal("0")), None),
+            (_base_create_kwargs(start_price=Decimal("-1")), InvalidAuctionStartPriceException),
             (_base_create_kwargs(minimum_increment=0), InvalidAuctionminimumIncrementException),
         ],
         ids=[
             "valid",
             "empty_title",
             "empty_description",
-            "zero_price",
+            "zero_price_is_allowed",
+            "negative_price",
             "zero_increment",
         ],
     )

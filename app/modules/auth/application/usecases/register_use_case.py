@@ -3,8 +3,8 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from app.core.config import settings
-from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
-from app.modules.auth.domain.exceptions.auth_exceptions import InvalidCredentialsException
+from app.modules.auth.domain.entities.refresh_token_entity import RefreshTokenEntity
+from app.modules.auth.domain.exceptions.auth_exceptions import EmailAlreadyRegisteredException
 from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
 from app.modules.auth.domain.ports.password_service_interface import IPasswordService
 from app.modules.auth.domain.ports.refresh_token_repository_interface import IRefreshTokenRepository
@@ -29,7 +29,7 @@ class RegisterUseCase:
     async def execute(self, name: str, email: str, password: str, cpf: str) -> dict:
         existing_user = await self.user_repository.get_by_email(email)
         if existing_user:
-            raise InvalidCredentialsException()
+            raise EmailAlreadyRegisteredException()
 
         hashed_password = self.password_service.hash_password(password)
 

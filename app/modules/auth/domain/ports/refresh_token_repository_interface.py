@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.modules.auth.domain.entities.refresh_tokel_entity import RefreshTokenEntity
+from app.modules.auth.domain.entities.refresh_token_entity import RefreshTokenEntity
 
 
 class IRefreshTokenRepository(ABC):

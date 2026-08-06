@@ -16,6 +16,6 @@ class BiddingModel(Base):
     minimum_increment = Column(Numeric(12, 2), nullable=False)
     last_user_id = Column(UUID(as_uuid=True), nullable=True)
     last_amount = Column(Numeric(12, 2), nullable=True)
-    timestamp = Column(DateTime, default=datetime.now(UTC))
+    timestamp = Column(DateTime, default=lambda: datetime.now(UTC))
 
     

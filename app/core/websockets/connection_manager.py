@@ -18,5 +18,3 @@ class ConnectionManager:
     async def broadcast(self, auction_id: str, event_name: str, payload: dict) -> None:
         for connections in self._rooms.get(auction_id, []):
             await connections.send_json({"event": event_name, "payload": payload})
-
-manager = ConnectionManager()

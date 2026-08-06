@@ -15,7 +15,7 @@ class JWTService(IJWTService):
         expires_delta: timedelta | None = None,
         name: str | None = None,
         email: str | None = None,
-        role: list[str] | None = None,
+        role: str | None = None,
     ) -> str:
         expire = datetime.now(UTC) + (
             expires_delta if expires_delta else timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

@@ -1,7 +1,8 @@
-from fastapi import Depends, Request
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database.session import get_db
+from app.core.events.dependencies import get_event_bus
 from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.auction.application.usecases.cancel_auction_use_case import (
     CancelAuctionUseCase,
@@ -33,10 +34,6 @@ def get_auction_read_repository(
     session: AsyncSession = Depends(get_db),
 ) -> AuctionReadRepository:
     return AuctionReadRepository(session)
-
-
-def get_event_bus(request: Request) -> EventBusInterface:
-    return request.app.state.event_bus
 
 
 def get_create_auction_use_case(

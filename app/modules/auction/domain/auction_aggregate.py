@@ -62,7 +62,7 @@ class Auction:
             raise InvalidAuctionTitleException(title)
         if not description.strip():
             raise InvalidAuctionDescriptionException(description)
-        if start_price <= 0:
+        if start_price < 0:
             raise InvalidAuctionStartPriceException(start_price)
         if minimum_increment <= 0:
             raise InvalidAuctionminimumIncrementException(minimum_increment)

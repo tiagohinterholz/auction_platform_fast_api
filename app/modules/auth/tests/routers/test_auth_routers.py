@@ -11,6 +11,38 @@ class TestAuthRouters(RequestMixin):
         assert response.status_code == 201
         assert "access_token" in response.json()
 
+    async def test_register_rejects_password_too_short(self, client, register_payload):
+        request = RequestMixin.create(client)
+        payload = {**register_payload, "password": "Ab1@ab1"}  # 7 chars
+
+        response = await request.post("/auth/register", json=payload)
+
+        assert response.status_code == 422
+
+    async def test_register_rejects_password_without_uppercase(self, client, register_payload):
+        request = RequestMixin.create(client)
+        payload = {**register_payload, "password": "lowercase123"}
+
+        response = await request.post("/auth/register", json=payload)
+
+        assert response.status_code == 422
+
+    async def test_register_rejects_password_without_lowercase(self, client, register_payload):
+        request = RequestMixin.create(client)
+        payload = {**register_payload, "password": "UPPERCASE123"}
+
+        response = await request.post("/auth/register", json=payload)
+
+        assert response.status_code == 422
+
+    async def test_register_rejects_password_without_digit(self, client, register_payload):
+        request = RequestMixin.create(client)
+        payload = {**register_payload, "password": "NoDigitsHere"}
+
+        response = await request.post("/auth/register", json=payload)
+
+        assert response.status_code == 422
+
     async def test_register_duplicate_email_returns_401(self, client, register_payload):
         request = RequestMixin.create(client)
         await request.post("/auth/register", json=register_payload)

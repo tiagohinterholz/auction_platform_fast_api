@@ -4,9 +4,7 @@ from uuid import UUID
 from app.core.locks.lock_interface import ILockService
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.domain.exceptions.auction_exceptions import AuctionNotFoundException
-from app.modules.auction.domain.ports.auction_read_repository_interface import (
-    IAuctionReadRepository,
-)
+from app.modules.auction.domain.ports.auction_repository_interface import IAuctionRepository
 from app.modules.bidding.domain.bidding_aggregate import Bidding
 from app.modules.bidding.domain.exceptions.bidding_exceptions import (
     AuctionBeingProcessedException,
@@ -25,12 +23,12 @@ class PlaceBidUseCase:
     def __init__(
         self, 
         bidding_repository: IBiddingRepository, 
-        auction_read_repository: IAuctionReadRepository, 
+        auction_repository: IAuctionRepository, 
         event_bus: EventBusInterface, 
         lock_manager: ILockService
     ):
         self.bidding_repository = bidding_repository
-        self.auction_read_repository = auction_read_repository
+        self.auction_repository = auction_repository
         self.event_bus = event_bus
         self.lock_manager = lock_manager
     
@@ -43,11 +41,11 @@ class PlaceBidUseCase:
             if not lock_acquired:
                 raise AuctionBeingProcessedException()
 
-            auction = await self.auction_read_repository.get_by_id(str(auction_id))
+            auction = await self.auction_repository.get_by_id(str(auction_id))
             if not auction:
                 raise AuctionNotFoundException(f"Auction with id {auction_id} not found.")
             
-            if auction.status != AuctionStatus.ACTIVE.value:
+            if auction.status != AuctionStatus.ACTIVE:
                 raise InvalidBidPlaceException("Cannot place a bid on an inactive auction.")
             
             bidding = await self.bidding_repository.find_by_auction_id(str(auction_id))

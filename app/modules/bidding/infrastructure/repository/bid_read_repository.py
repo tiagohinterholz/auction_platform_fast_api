@@ -3,10 +3,11 @@ from collections.abc import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.modules.bidding.domain.ports.bidding_read_repository_interface import IBidReadRepository
 from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel
 
 
-class BidReadRepository:
+class BidReadRepository(IBidReadRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 

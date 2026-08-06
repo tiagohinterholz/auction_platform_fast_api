@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, status
 
-from app.core.auth.dependencies import get_current_user, require_admin, require_own_user
+from app.core.auth.dependencies import require_admin, require_own_user
 from app.modules.users.application.schemas.update_user_schema import UpdateUserSchema
 from app.modules.users.application.schemas.user_response_schema import UserResponse
 from app.modules.users.application.usecases.delete_user_usecase import DeleteUserUseCase
@@ -32,7 +32,7 @@ async def get_all_users(
 async def get_user_by_id(
     id: uuid.UUID,
     usecase: GetUserByIdUseCase = Depends(get_user_by_id_use_case),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_own_user),
 ):
     return await usecase.execute(str(id))
 

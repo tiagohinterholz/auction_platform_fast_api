@@ -11,14 +11,17 @@ from app.modules.auction.application.schemas.create_auction_schema import Create
 from app.modules.auction.application.schemas.schedule_auction_schema import ScheduleAuctionSchema
 from app.modules.auction.application.usecases.cancel_auction_use_case import CancelAuctionUseCase
 from app.modules.auction.application.usecases.create_auction_use_case import CreateAuctionUseCase
+from app.modules.auction.application.usecases.get_auction_by_id_use_case import (
+    GetAuctionByIdUseCase,
+)
 from app.modules.auction.application.usecases.schedule_auction_use_case import (
     ScheduleAuctionUseCase,
 )
-from app.modules.auction.domain.exceptions.auction_exceptions import InvalidAuctionIdException
 from app.modules.auction.infrastructure.repository.auction_read_repository import (
     AuctionReadRepository,
 )
 from app.modules.auction.routers.dependencies import (
+    get_auction_by_id_use_case,
     get_auction_read_repository,
     get_cancel_auction_use_case,
     get_create_auction_use_case,
@@ -47,12 +50,9 @@ async def get_my_auctions(
 @router.get("/{auction_id}", status_code=status.HTTP_200_OK)
 async def get_auction_by_id(
     auction_id: uuid.UUID,
-    auction_repository: AuctionReadRepository = Depends(get_auction_read_repository),
+    usecase: GetAuctionByIdUseCase = Depends(get_auction_by_id_use_case),
 ) -> AuctionSchema:
-    auction = await auction_repository.get_by_id(str(auction_id))
-    if not auction:
-        raise InvalidAuctionIdException(f"Auction with id {auction_id} not found.")
-    
+    auction = await usecase.execute(str(auction_id))
     return AuctionSchema.model_validate(auction)
 
 

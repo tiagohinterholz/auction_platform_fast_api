@@ -11,6 +11,9 @@ from app.modules.auction.application.schemas.schedule_auction_schema import Sche
 from app.modules.auction.application.usecases.cancel_auction_use_case import CancelAuctionUseCase
 from app.modules.auction.application.usecases.create_auction_use_case import CreateAuctionUseCase
 from app.modules.auction.application.usecases.finish_auction_use_case import FinishAuctionUseCase
+from app.modules.auction.application.usecases.get_auction_by_id_use_case import (
+    GetAuctionByIdUseCase,
+)
 from app.modules.auction.application.usecases.schedule_auction_use_case import (
     ScheduleAuctionUseCase,
 )
@@ -18,6 +21,9 @@ from app.modules.auction.application.usecases.start_auction_use_case import Star
 from app.modules.auction.domain.auction_aggregate import Auction
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.domain.exceptions.auction_exceptions import InvalidAuctionIdException
+from app.modules.auction.domain.ports.auction_read_repository_interface import (
+    IAuctionReadRepository,
+)
 from app.modules.auction.domain.ports.auction_repository_interface import IAuctionRepository
 
 
@@ -172,3 +178,25 @@ class TestCancelAuctionUseCase(AuctionUseCaseBase):
 
         with pytest.raises(InvalidAuctionIdException):
             await self.use_case.execute(uuid.uuid4(), current_date=datetime.now())
+
+
+class TestGetAuctionByIdUseCase:
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.repo = AsyncMock(spec=IAuctionReadRepository)
+        self.use_case = GetAuctionByIdUseCase(self.repo)
+
+    async def test_returns_auction(self):
+        auction = object()
+        self.repo.get_by_id.return_value = auction
+
+        result = await self.use_case.execute(str(uuid.uuid4()))
+
+        assert result is auction
+
+    async def test_raises_when_not_found(self):
+        self.repo.get_by_id.return_value = None
+
+        with pytest.raises(InvalidAuctionIdException):
+            await self.use_case.execute(str(uuid.uuid4()))

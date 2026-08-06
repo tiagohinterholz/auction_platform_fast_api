@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from collections.abc import Callable
 
 from app.core.events.event_bus_interface import EventBusInterface
@@ -17,4 +18,7 @@ class InMemoryEventBus(EventBusInterface):
             event_name = type(event).__name__
             handlers = self._handlers.get(event_name, [])
             for handler in handlers:
-                await handler(event)
+                try:
+                    await handler(event)
+                except Exception:
+                    logger.exception(f"Handler {handler} failed for event {event_name}")

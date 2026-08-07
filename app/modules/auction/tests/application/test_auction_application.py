@@ -59,9 +59,8 @@ class TestCreateAuctionUseCase(AuctionUseCaseBase):
         data = CreateAuctionSchema(
             title="Leilão teste",
             description="Descrição",
-            start_price=100.0,
-            minimum_increment=10.0,
-            status="created",
+            start_price=Decimal("100.0"),
+            minimum_increment=Decimal("10.0"),
             images=[],
         )
 

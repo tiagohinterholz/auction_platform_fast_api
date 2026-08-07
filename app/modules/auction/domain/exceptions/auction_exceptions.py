@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from app.core.exceptions.exceptions import ConflictException, DomainException, NotFoundException
 
 
@@ -17,7 +19,7 @@ class InvalidAuctionDescriptionException(DomainException):
 
 
 class InvalidAuctionStartPriceException(DomainException):
-    def __init__(self, start_price: float):
+    def __init__(self, start_price: Decimal):
         super().__init__(f"Invalid auction start price: {start_price}")
 
 
@@ -27,7 +29,7 @@ class InvalidAuctionEndTimeException(DomainException):
 
 
 class InvalidAuctionminimumIncrementException(DomainException):
-    def __init__(self, minimum_increment: float):
+    def __init__(self, minimum_increment: Decimal):
         super().__init__(f"Invalid auction minimum increment: {minimum_increment}")
 
 

@@ -17,13 +17,9 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .coverage
-.local.md
+*.local.md
 settings.json
 
 #IA
 .codex
 AGENTS.md
-
-# Notas pessoais de bugs (não publicar)
-.bugs.md
-.audit-report.md

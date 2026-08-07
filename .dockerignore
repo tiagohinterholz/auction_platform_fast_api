@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.git/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.env
+*.log
+.vscode/
+.codex/
+.audit-report.md
+.bugs.md

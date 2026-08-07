@@ -13,6 +13,7 @@ class AuctionSchema(BaseModel):
     status: str
     start_price: Decimal
     minimum_increment: Decimal
+    highest_bid: Decimal | None = None
     start_time: datetime | None = None
     end_time: datetime | None = None
     images: list[str] | None = None

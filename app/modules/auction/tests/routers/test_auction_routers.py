@@ -48,6 +48,19 @@ class TestAuctionRouters(RequestMixin):
         response = await request.get(f"/auctions/{uuid.uuid4()}")
         assert response.status_code == 404
 
+    async def test_freshly_created_auction_has_lowercase_status_and_null_highest_bid(
+        self, client, user_obj, create_auction_payload
+    ):
+        request_auth = await self.authenticated(client, user_obj.email, "Pass@123")
+        created = await request_auth.post("/auctions", json=create_auction_payload)
+        auction_id = created.json()["id"]
+
+        response = await request_auth.get(f"/auctions/{auction_id}")
+
+        body = response.json()
+        assert body["status"] == "created"
+        assert body["highest_bid"] is None
+
     async def test_create_auction_returns_401_when_unauthenticated(self, client, create_auction_payload):
         request = RequestMixin.create(client)
         response = await request.post("/auctions", json=create_auction_payload)

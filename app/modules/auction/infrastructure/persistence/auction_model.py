@@ -13,7 +13,7 @@ class AuctionModel(Base):
     user_id = Column(UUID(as_uuid=True), nullable=False)
     description = Column(String(255), nullable=False)
     title = Column(String(100), nullable=False)
-    status = Column(String(50), nullable=False, default="CREATED")
+    status = Column(String(50), nullable=False, default="created")
     start_price = Column(Numeric(12, 2), nullable=False)
     minimum_increment = Column(Numeric(12, 2), nullable=False)
     start_time = Column(DateTime, nullable=True)

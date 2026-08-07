@@ -16,7 +16,7 @@ class AuctionReadModel(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="CREATED")
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="created")
     start_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     minimum_increment: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     highest_bid: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)

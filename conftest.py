@@ -49,7 +49,7 @@ async def client(db_session: AsyncSession):
     from app.core.events.in_memory_event_bus import InMemoryEventBus
     from app.core.locks.dependencies import get_lock_service
     from app.core.locks.lock_interface import ILockService
-    from main import app
+    from main import app, wire_event_handlers
 
     class FakeLockService(ILockService):
         async def acquire(self, key: str, ttl_ms: int) -> bool:
@@ -63,7 +63,12 @@ async def client(db_session: AsyncSession):
 
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_lock_service] = lambda: FakeLockService()
-    app.state.event_bus = InMemoryEventBus()
+    event_bus = InMemoryEventBus()
+    app.state.event_bus = event_bus
+    # Same handler wiring main.py's lifespan does for production, pointed at
+    # the test database instead — without this, event-driven side effects
+    # (read model updates, websocket broadcasts) never ran in any test here.
+    wire_event_handlers(event_bus, TestSessionLocal)
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"

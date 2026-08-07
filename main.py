@@ -40,51 +40,60 @@ event_bus = InMemoryEventBus()
 connection_manager = ConnectionManager()
 
 
+def wire_event_handlers(bus: InMemoryEventBus, session_factory) -> None:
+    """Subscribes every domain event handler to `bus`, each opening its own
+    session via `session_factory` (AsyncSessionLocal in production,
+    TestSessionLocal in tests) — same wiring, different database.
+    """
+
+    async def on_auction_created(e):
+        async with session_factory() as session:
+            await AuctionCreatedHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_auction_scheduled(e):
+        async with session_factory() as session:
+            await AuctionScheduledHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_auction_started(e):
+        async with session_factory() as session:
+            await AuctionStartedHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_auction_finished(e):
+        async with session_factory() as session:
+            await AuctionFinishedHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_auction_cancelled(e):
+        async with session_factory() as session:
+            await AuctionCancelledHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_bid_placed_auction(e):
+        async with session_factory() as session:
+            await AuctionBidPlacedHandler(
+                write_repository=AuctionRepository(session),
+                read_repository=AuctionReadRepository(session),
+                event_bus=bus,
+            ).handle(e)
+
+    async def on_bid_placed_bidding(e):
+        async with session_factory() as session:
+            await BiddingBidPlacedHandler(BidReadRepository(session)).handle(e)
+
+    bus.subscribe("AuctionCreatedEvent", on_auction_created)
+    bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
+    bus.subscribe("AuctionStartedEvent", on_auction_started)
+    bus.subscribe("AuctionFinishedEvent", on_auction_finished)
+    bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
+    bus.subscribe("BidPlacedEvent", on_bid_placed_auction)
+    bus.subscribe("BidPlacedEvent", on_bid_placed_bidding)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.redis = create_redis_client()
     app.state.event_bus = event_bus
     app.state.connection_manager = connection_manager
 
-    async def on_auction_created(e):
-        async with AsyncSessionLocal() as session:
-            await AuctionCreatedHandler(AuctionReadRepository(session)).handle(e)
-
-    async def on_auction_scheduled(e):
-        async with AsyncSessionLocal() as session:
-            await AuctionScheduledHandler(AuctionReadRepository(session)).handle(e)
-
-    async def on_auction_started(e):
-        async with AsyncSessionLocal() as session:
-            await AuctionStartedHandler(AuctionReadRepository(session)).handle(e)
-
-    async def on_auction_finished(e):
-        async with AsyncSessionLocal() as session:
-            await AuctionFinishedHandler(AuctionReadRepository(session)).handle(e)
-
-    async def on_auction_cancelled(e):
-        async with AsyncSessionLocal() as session:
-            await AuctionCancelledHandler(AuctionReadRepository(session)).handle(e)
-
-    async def on_bid_placed_auction(e):
-        async with AsyncSessionLocal() as session:
-            await AuctionBidPlacedHandler(
-                write_repository=AuctionRepository(session),
-                read_repository=AuctionReadRepository(session),
-                event_bus=event_bus,
-            ).handle(e)
-
-    async def on_bid_placed_bidding(e):
-        async with AsyncSessionLocal() as session:
-            await BiddingBidPlacedHandler(BidReadRepository(session)).handle(e)
-
-    event_bus.subscribe("AuctionCreatedEvent", on_auction_created)
-    event_bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
-    event_bus.subscribe("AuctionStartedEvent", on_auction_started)
-    event_bus.subscribe("AuctionFinishedEvent", on_auction_finished)
-    event_bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
-    event_bus.subscribe("BidPlacedEvent", on_bid_placed_auction)
-    event_bus.subscribe("BidPlacedEvent", on_bid_placed_bidding)
+    wire_event_handlers(event_bus, AsyncSessionLocal)
 
     yield
 

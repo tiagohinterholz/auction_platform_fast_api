@@ -8,6 +8,8 @@ from app.core.config import settings
 from app.core.database.session import AsyncSessionLocal
 from app.core.events.in_memory_event_bus import InMemoryEventBus
 from app.core.exceptions.error_handlers import setup_exception_handlers
+from app.core.logging.config import setup_logging
+from app.core.logging.middleware import APILoggingMiddleware, RequestIDMiddleware
 from app.core.redis.client import create_redis_client
 from app.core.websockets.connection_manager import ConnectionManager
 from app.modules.auction.application.handlers.bid_placed_handler import (
@@ -35,6 +37,8 @@ from app.modules.bidding.infrastructure.repository.bid_read_repository import Bi
 from app.modules.bidding.routers.bid_routers import router as bidding_router
 from app.modules.notifications.routers.notification_router import setup_notifications
 from app.modules.users.routers.users_router import router as users_router
+
+setup_logging()
 
 event_bus = InMemoryEventBus()
 connection_manager = ConnectionManager()
@@ -124,6 +128,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Last added = outermost = runs first: RequestIDMiddleware must set the
+# request_id ContextVar before APILoggingMiddleware logs the line.
+app.add_middleware(APILoggingMiddleware)
+app.add_middleware(RequestIDMiddleware)
 
 setup_exception_handlers(app)
 

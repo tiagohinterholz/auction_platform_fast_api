@@ -12,12 +12,6 @@ request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
-    """Reads/generates X-Request-ID, exposes it to the logging machinery via
-    a ContextVar (safe under asyncio: each request runs in its own Task, so
-    concurrent requests never see each other's value), and echoes it back on
-    the response header.
-    """
-
     async def dispatch(self, request: Request, call_next) -> Response:
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
         token = request_id_var.set(request_id)
@@ -35,9 +29,20 @@ class APILoggingMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
         start_time = time.monotonic()
-        response = await call_next(request)
-        duration = time.monotonic() - start_time
 
+        try:
+            response = await call_next(request)
+        except Exception:
+            duration = time.monotonic() - start_time
+            logger.exception(
+                f"Method: {request.method} | "
+                f"Path: {request.url.path} | "
+                f"Status: 500 (unhandled) | "
+                f"Duration: {duration:.2f}s"
+            )
+            raise
+
+        duration = time.monotonic() - start_time
         log_message = (
             f"Method: {request.method} | "
             f"Path: {request.url.path} | "

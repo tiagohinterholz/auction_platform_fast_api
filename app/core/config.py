@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int
     CORS_ORIGINS: str = "http://localhost:5173"
     LOG_FORMAT: str = "text"
+    SENTRY_DSN: str | None = None
+    SENTRY_ENVIRONMENT: str = "development"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

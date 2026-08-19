@@ -11,6 +11,7 @@ from app.core.exceptions.error_handlers import setup_exception_handlers
 from app.core.logging.config import setup_logging
 from app.core.logging.middleware import APILoggingMiddleware, RequestIDMiddleware
 from app.core.redis.client import create_redis_client
+from app.core.sentry.config import setup_sentry
 from app.core.websockets.connection_manager import ConnectionManager
 from app.modules.auction.application.handlers.bid_placed_handler import (
     BidPlacedHandler as AuctionBidPlacedHandler,
@@ -39,6 +40,7 @@ from app.modules.notifications.routers.notification_router import setup_notifica
 from app.modules.users.routers.users_router import router as users_router
 
 setup_logging()
+setup_sentry()
 
 event_bus = InMemoryEventBus()
 connection_manager = ConnectionManager()

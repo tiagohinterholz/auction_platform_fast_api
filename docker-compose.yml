@@ -21,7 +21,9 @@ services:
       - redis_data:/data
 
   api:
-    build: .
+    build:
+      context: .
+      target: builder
     container_name: fastapi_auction_api
     depends_on:
       - postgres
@@ -33,11 +35,14 @@ services:
     volumes:
       - .:/app
       - venv:/app/.venv
+      - uv_cache:/root/.cache/uv
     command: >
-      bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+      bash -c "uv sync --frozen && uv run alembic upgrade head && uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
   worker:
-    build: .
+    build:
+      context: .
+      target: builder
     container_name: fastapi_auction_worker
     depends_on:
       - postgres
@@ -47,10 +52,30 @@ services:
     volumes:
       - .:/app
       - venv:/app/.venv
+      - uv_cache:/root/.cache/uv
     command: >
-      celery -A app.core.celery.celery_app worker --loglevel=info
+      bash -c "uv sync --frozen && uv run celery -A app.core.celery.celery_app worker --loglevel=info"
+  
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: fastapi_auction_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - api
+  
+  grafana:
+    image: grafana/grafana:10.0.3
+    container_name: fastapi_auction_grafana
+    ports:
+      - "3010:3000"
+    depends_on:
+      - prometheus
 
 volumes:
   postgres_data:
   redis_data:
   venv:
+  uv_cache:

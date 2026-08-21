@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.core.config import settings
 from app.core.database.session import AsyncSessionLocal
@@ -135,6 +136,7 @@ app.add_middleware(
 # request_id ContextVar before APILoggingMiddleware logs the line.
 app.add_middleware(APILoggingMiddleware)
 app.add_middleware(RequestIDMiddleware)
+Instrumentator().instrument(app).expose(app)
 
 setup_exception_handlers(app)
 

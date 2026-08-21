@@ -20,6 +20,13 @@ services:
     volumes:
       - redis_data:/data
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: fastapi_auction_mailpit
+    ports:
+      - "8025:8025" # web UI
+      - "1025:1025" # SMTP
+
   api:
     build:
       context: .
@@ -28,6 +35,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - mailpit
     ports:
       - "8000:8000"
     env_file:

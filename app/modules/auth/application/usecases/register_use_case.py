@@ -3,6 +3,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from app.core.config import settings
+from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.auth.domain.entities.refresh_token_entity import RefreshTokenEntity
 from app.modules.auth.domain.exceptions.auth_exceptions import EmailAlreadyRegisteredException
 from app.modules.auth.domain.ports.jwt_service_interface import IJWTService
@@ -20,11 +21,13 @@ class RegisterUseCase:
         password_service: IPasswordService,
         jwt_service: IJWTService,
         refresh_token_repository: IRefreshTokenRepository,
+        event_bus: EventBusInterface,
     ):
         self.user_repository = user_repository
         self.password_service = password_service
         self.jwt_service = jwt_service
         self.refresh_token_repository = refresh_token_repository
+        self.event_bus = event_bus
 
     async def execute(self, name: str, email: str, password: str, cpf: str) -> dict:
         existing_user = await self.user_repository.get_by_email(email)
@@ -42,6 +45,7 @@ class RegisterUseCase:
         )
 
         await self.user_repository.save(user)
+        await self.event_bus.publish(user.pull_events())
 
         access_token = self.jwt_service.create_access_token(
             subject=user.id, name=user.name, email=user.email, role=user.role.value

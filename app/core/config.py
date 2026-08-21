@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     LOG_FORMAT: str = "text"
     SENTRY_DSN: str | None = None
     SENTRY_ENVIRONMENT: str = "development"
+    EMAIL_PROVIDER: str = "mailpit"  # "mailpit" | "resend" | "console" (no-op, used in tests)
+    EMAIL_FROM: str = "no-reply@auction-platform.local"
+    MAILPIT_SMTP_HOST: str = "mailpit"
+    MAILPIT_SMTP_PORT: int = 1025
+    RESEND_API_KEY: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

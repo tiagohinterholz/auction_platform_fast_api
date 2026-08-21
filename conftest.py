@@ -1,6 +1,7 @@
 import os
 
 os.environ["SENTRY_DSN"] = ""
+os.environ["EMAIL_PROVIDER"] = "console"
 
 import pytest
 from httpx import ASGITransport, AsyncClient

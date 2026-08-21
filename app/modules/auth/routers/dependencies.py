@@ -3,6 +3,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database.session import get_db
+from app.core.events.dependencies import get_event_bus
+from app.core.events.event_bus_interface import EventBusInterface
 from app.core.security.jwt_service import JWTService
 from app.core.security.password_service import PasswordService
 from app.modules.auth.application.usecases.login_use_case import LoginUseCase
@@ -36,8 +38,11 @@ def get_refresh_token_repository(
 def get_register_use_case(
     user_repo: UserRepository = Depends(get_user_repository),
     refresh_token_repo: RefreshTokenRepository = Depends(get_refresh_token_repository),
+    event_bus: EventBusInterface = Depends(get_event_bus),
 ) -> RegisterUseCase:
-    return RegisterUseCase(user_repo, _password_service, _jwt_service, refresh_token_repo)
+    return RegisterUseCase(
+        user_repo, _password_service, _jwt_service, refresh_token_repo, event_bus
+    )
 
 
 def get_login_use_case(

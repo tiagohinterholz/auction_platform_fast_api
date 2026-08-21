@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aiosmtplib>=5.1.2",
     "alembic>=1.18.4",
     "asyncpg>=0.31.0",
     "bcrypt>=5.0.0",
@@ -19,6 +20,7 @@ dependencies = [
     "pytest-faker>=2.0.0",
     "python-jose[cryptography]>=3.5.0",
     "redis>=7.4.0",
+    "resend>=2.38.0",
     "sentry-sdk>=2.68.0",
     "sqlalchemy>=2.0.49",
     "uvicorn>=0.46.0",

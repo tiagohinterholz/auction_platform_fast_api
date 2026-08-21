@@ -22,7 +22,6 @@ from app.modules.auction.application.handlers.cancelled_auction_handler import (
     AuctionCancelledHandler,
 )
 from app.modules.auction.application.handlers.created_auction_handler import AuctionCreatedHandler
-from app.modules.auction.application.handlers.finished_auction_handler import AuctionFinishedHandler
 from app.modules.auction.application.handlers.scheduled_auction_handler import (
     AuctionScheduledHandler,
 )
@@ -69,10 +68,6 @@ def wire_event_handlers(bus: InMemoryEventBus, session_factory) -> None:
         async with session_factory() as session:
             await AuctionStartedHandler(AuctionReadRepository(session)).handle(e)
 
-    async def on_auction_finished(e):
-        async with session_factory() as session:
-            await AuctionFinishedHandler(AuctionReadRepository(session)).handle(e)
-
     async def on_auction_cancelled(e):
         async with session_factory() as session:
             await AuctionCancelledHandler(AuctionReadRepository(session)).handle(e)
@@ -95,7 +90,6 @@ def wire_event_handlers(bus: InMemoryEventBus, session_factory) -> None:
     bus.subscribe("AuctionCreatedEvent", on_auction_created)
     bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
     bus.subscribe("AuctionStartedEvent", on_auction_started)
-    bus.subscribe("AuctionFinishedEvent", on_auction_finished)
     bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
     bus.subscribe("BidPlacedEvent", on_bid_placed_auction)
     bus.subscribe("BidPlacedEvent", on_bid_placed_bidding)

@@ -25,8 +25,8 @@ from app.modules.bidding.infrastructure.repository.bidding_repository import Bid
 from app.modules.users.infrastructure.repository.users_repository import UserRepository
 
 
-async def _start_auction(auction_id: str) -> None:
-    async with AsyncSessionLocal() as session:
+async def _start_auction(auction_id: str, session_factory=AsyncSessionLocal) -> None:
+    async with session_factory() as session:
         write_repo = AuctionRepository(session)
         read_repo = AuctionReadRepository(session)
         bidding_repo = BiddingRepository(session)
@@ -39,8 +39,8 @@ async def _start_auction(auction_id: str) -> None:
         await use_case.execute(uuid.UUID(auction_id), datetime.now(UTC))
 
 
-async def _finish_auction(auction_id: str) -> None:
-    async with AsyncSessionLocal() as session:
+async def _finish_auction(auction_id: str, session_factory=AsyncSessionLocal) -> None:
+    async with session_factory() as session:
         write_repo = AuctionRepository(session)
         read_repo = AuctionReadRepository(session)
         bid_read_repo = BidReadRepository(session)

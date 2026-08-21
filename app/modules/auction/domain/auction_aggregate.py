@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from .enums.auction_status import AuctionStatus
@@ -130,11 +130,17 @@ class Auction:
     def start(self, current_time: datetime):
         self._assert_transaction(AuctionStatus.SCHEDULED, AuctionStatus.ACTIVE)
 
-        if self._start_time is None or self._start_time > current_time:
+        start_time = self._as_aware(self._start_time)
+        if current_time.tzinfo is None:
+            current_time = current_time.replace(tzinfo=UTC)
+        if start_time is None or start_time > current_time:
             raise InvalidAuctionStartTimeException(
                 f"Auction cannot be started before {self._start_time}."
             )
-        self._start_time = current_time
+        # Columns are TIMESTAMP WITHOUT TIME ZONE — store naive, matching
+        # what was already there, even though the comparison above needed
+        # both sides timezone-aware to be safe to compare at all.
+        self._start_time = current_time.replace(tzinfo=None)
         self._status = AuctionStatus.ACTIVE
 
         self.events.append(
@@ -153,11 +159,14 @@ class Auction:
     def finish(self, current_time: datetime):
         self._assert_transaction(AuctionStatus.ACTIVE, AuctionStatus.FINISHED)
 
-        if self._end_time is None or self._end_time > current_time:
+        end_time = self._as_aware(self._end_time)
+        if current_time.tzinfo is None:
+            current_time = current_time.replace(tzinfo=UTC)
+        if end_time is None or end_time > current_time:
             raise InvalidAuctionEndTimeException(
                 f"Auction cannot be finished before {self._end_time}."
             )
-        self._end_time = current_time
+        self._end_time = current_time.replace(tzinfo=None)
         self._status = AuctionStatus.FINISHED
 
         self.events.append(
@@ -189,6 +198,17 @@ class Auction:
                 }
             )
         )
+
+    @staticmethod
+    def _as_aware(value: datetime | None) -> datetime | None:
+        """DB-loaded start/end times come back naive; current_time is always
+        passed in as timezone-aware (datetime.now(UTC)). Comparing the two
+        directly raises TypeError, so naive values are assumed to already be
+        UTC (same assumption scheduled_auction_handler.py already makes).
+        """
+        if value is not None and value.tzinfo is None:
+            return value.replace(tzinfo=UTC)
+        return value
 
     def _assert_transaction(self, from_status: AuctionStatus, to_status: AuctionStatus):
         if self._status != from_status:

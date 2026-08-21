@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.users.application.schemas.update_user_schema import UpdateUserSchema
 from app.modules.users.application.usecases.delete_user_usecase import DeleteUserUseCase
 from app.modules.users.application.usecases.get_all_users_usecase import GetAllUsersUseCase
@@ -79,7 +80,8 @@ class TestUpdateUserUseCase(UserUseCaseBase):
 
     @pytest.fixture(autouse=True)
     def setup(self, setup_mocks):
-        self.use_case = UpdateUserUseCase(self.repo)
+        self.event_bus = AsyncMock(spec=EventBusInterface)
+        self.use_case = UpdateUserUseCase(self.repo, self.event_bus)
 
     async def test_updates_and_saves(self):
         user = _make_user()
@@ -91,6 +93,7 @@ class TestUpdateUserUseCase(UserUseCaseBase):
         self.repo.save.assert_called_once()
         assert result.name == "Jane Doe"
         assert result.email == "jane.doe@example.com"
+        self.event_bus.publish.assert_called_once()
 
     async def test_raises_when_not_found(self):
         self.repo.get_by_id.return_value = None
@@ -103,7 +106,8 @@ class TestDeleteUserUseCase(UserUseCaseBase):
 
     @pytest.fixture(autouse=True)
     def setup(self, setup_mocks):
-        self.use_case = DeleteUserUseCase(self.repo)
+        self.event_bus = AsyncMock(spec=EventBusInterface)
+        self.use_case = DeleteUserUseCase(self.repo, self.event_bus)
 
     async def test_saves_user(self):
         user = _make_user()
@@ -114,6 +118,7 @@ class TestDeleteUserUseCase(UserUseCaseBase):
         self.repo.save.assert_called_once()
         assert user.is_active is False
         assert result is None
+        self.event_bus.publish.assert_called_once()
 
     async def test_raises_when_not_found(self):
         self.repo.get_by_id.return_value = None

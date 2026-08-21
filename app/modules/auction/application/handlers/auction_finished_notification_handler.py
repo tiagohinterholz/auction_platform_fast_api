@@ -3,9 +3,6 @@ from decimal import Decimal
 
 from app.core.email.email_service_interface import IEmailService
 from app.modules.auction.domain.events.auction_events import AuctionFinishedEvent
-from app.modules.auction.infrastructure.repository.auction_read_repository import (
-    AuctionReadRepository,
-)
 from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
 from app.modules.users.infrastructure.repository.users_repository import UserRepository
 
@@ -19,22 +16,17 @@ class AuctionFinishedNotificationHandler:
 
     def __init__(
         self,
-        auction_read_repository: AuctionReadRepository,
         bid_read_repository: BidReadRepository,
         users_repository: UserRepository,
         email_service: IEmailService,
     ):
-        self.auction_read_repository = auction_read_repository
         self.bid_read_repository = bid_read_repository
         self.users_repository = users_repository
         self.email_service = email_service
 
     async def handle(self, event: AuctionFinishedEvent) -> None:
         auction_id = str(event.payload["id"])
-
-        auction = await self.auction_read_repository.get_by_id(auction_id)
-        if not auction:
-            return
+        auction_title = event.payload["title"]
 
         bids = await self.bid_read_repository.find_all_by_auction_id(auction_id)
         if not bids:
@@ -50,9 +42,9 @@ class AuctionFinishedNotificationHandler:
         winner_amount = best_per_user[winner_id]
         loser_ids = [uid for uid in best_per_user if uid != winner_id]
 
-        await self._notify_winner(auction.title, winner_id, winner_amount)
+        await self._notify_winner(auction_title, winner_id, winner_amount)
         for loser_id in loser_ids:
-            await self._notify_loser(auction.title, loser_id, winner_amount)
+            await self._notify_loser(auction_title, loser_id, winner_amount)
 
     async def _notify_winner(self, auction_title: str, winner_id: str, amount: Decimal) -> None:
         try:

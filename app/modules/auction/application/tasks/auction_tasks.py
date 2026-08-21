@@ -51,7 +51,6 @@ async def _finish_auction(auction_id: str) -> None:
         event_bus.subscribe(
             "AuctionFinishedEvent",
             AuctionFinishedNotificationHandler(
-                auction_read_repository=read_repo,
                 bid_read_repository=bid_read_repo,
                 users_repository=users_repo,
                 email_service=get_email_service(),

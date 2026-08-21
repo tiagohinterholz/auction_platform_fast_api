@@ -164,6 +164,7 @@ class Auction:
             AuctionFinishedEvent(
                 payload={
                     "id": str(self.id),
+                    "title": self.title,
                     "end_time": self.end_time.isoformat() if self.end_time else "",
                 }
             )

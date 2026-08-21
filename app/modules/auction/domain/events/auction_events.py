@@ -18,11 +18,6 @@ class AuctionScheduledEvent(BaseDomainEvent):
     payload: dict[str, str]
 
 
-class AuctionActiveEvent(BaseDomainEvent):
-    name: str = "auction.active"
-    payload: dict[str, str]
-
-
 class AuctionExtendedEvent(BaseDomainEvent):
     name: str = "auction.extended"
     payload: dict[str, str]

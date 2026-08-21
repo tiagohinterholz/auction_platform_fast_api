@@ -8,9 +8,6 @@ from app.modules.auction.application.handlers.auction_finished_notification_hand
     AuctionFinishedNotificationHandler,
 )
 from app.modules.auction.domain.events.auction_events import AuctionFinishedEvent
-from app.modules.auction.infrastructure.repository.auction_read_repository import (
-    AuctionReadRepository,
-)
 from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
 from app.modules.users.infrastructure.repository.users_repository import UserRepository
 
@@ -27,22 +24,19 @@ class TestAuctionFinishedNotificationHandler:
 
     def setup_method(self):
         self.auction_id = uuid.uuid4()
-        self.auction_repo = AsyncMock(spec=AuctionReadRepository)
         self.bid_repo = AsyncMock(spec=BidReadRepository)
         self.users_repo = AsyncMock(spec=UserRepository)
         self.email_service = AsyncMock(spec=IEmailService)
         self.handler = AuctionFinishedNotificationHandler(
-            auction_read_repository=self.auction_repo,
             bid_read_repository=self.bid_repo,
             users_repository=self.users_repo,
             email_service=self.email_service,
         )
-        self.auction_repo.get_by_id.return_value = SimpleNamespace(
-            id=self.auction_id, title="iPhone 15"
-        )
 
     def _event(self) -> AuctionFinishedEvent:
-        return AuctionFinishedEvent(payload={"id": str(self.auction_id), "end_time": ""})
+        return AuctionFinishedEvent(
+            payload={"id": str(self.auction_id), "title": "iPhone 15", "end_time": ""}
+        )
 
     async def test_notifies_winner_and_losers_by_highest_bid_per_user(self):
         winner_id, loser_id = uuid.uuid4(), uuid.uuid4()
@@ -61,6 +55,7 @@ class TestAuctionFinishedNotificationHandler:
         assert self.email_service.send.call_count == 2
         recipients = {call.kwargs["to"] for call in self.email_service.send.call_args_list}
         assert recipients == {"winner@test.com", "loser@test.com"}
+        assert "iPhone 15" in self.email_service.send.call_args_list[0].kwargs["subject"]
 
     async def test_does_nothing_when_there_are_no_bids(self):
         self.bid_repo.find_all_by_auction_id.return_value = []
@@ -69,14 +64,6 @@ class TestAuctionFinishedNotificationHandler:
 
         self.email_service.send.assert_not_called()
         self.users_repo.get_by_id.assert_not_called()
-
-    async def test_does_nothing_when_auction_is_not_found(self):
-        self.auction_repo.get_by_id.return_value = None
-
-        await self.handler.handle(self._event())
-
-        self.bid_repo.find_all_by_auction_id.assert_not_called()
-        self.email_service.send.assert_not_called()
 
     async def test_one_recipient_lookup_failing_does_not_block_the_others(self):
         winner_id, loser_id = uuid.uuid4(), uuid.uuid4()

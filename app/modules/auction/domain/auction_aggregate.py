@@ -103,16 +103,28 @@ class Auction:
     def schedule(self, start_time: datetime, end_time: datetime):
         self._assert_transaction(AuctionStatus.CREATED, AuctionStatus.SCHEDULED)
 
+        # Client requests may send either naive or timezone-aware ISO
+        # timestamps — normalize both to aware (assume UTC if naive) before
+        # comparing, same rule _as_aware() already applies to DB-loaded
+        # values in start()/finish().
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=UTC)
+        if end_time.tzinfo is None:
+            end_time = end_time.replace(tzinfo=UTC)
+
         if start_time >= end_time:
             raise InvalidAuctionStartTimeException(start_time.isoformat())
 
-        if start_time <= datetime.now():
+        now = datetime.now(UTC)
+        if start_time <= now:
             raise InvalidAuctionStartTimeException(
-                f"Scheduling time {start_time} must be after {datetime.now()}."
+                f"Scheduling time {start_time} must be after {now}."
             )
 
-        self._start_time = start_time
-        self._end_time = end_time
+        # Columns are TIMESTAMP WITHOUT TIME ZONE — store naive, same as
+        # start()/finish() already do.
+        self._start_time = start_time.replace(tzinfo=None)
+        self._end_time = end_time.replace(tzinfo=None)
         self._status = AuctionStatus.SCHEDULED
 
         self.events.append(

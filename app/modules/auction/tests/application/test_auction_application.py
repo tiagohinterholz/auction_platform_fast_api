@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import AsyncMock
 
@@ -82,8 +82,8 @@ class TestScheduleAuctionUseCase(AuctionUseCaseBase):
         self.repo.get_by_id.return_value = auction
 
         data = ScheduleAuctionSchema(
-            start_date=datetime.now() + timedelta(hours=1),
-            end_date=datetime.now() + timedelta(hours=3),
+            start_date=datetime.now(UTC) + timedelta(hours=1),
+            end_date=datetime.now(UTC) + timedelta(hours=3),
         )
 
         await self.use_case.execute(uuid.uuid4(), data)
@@ -95,8 +95,8 @@ class TestScheduleAuctionUseCase(AuctionUseCaseBase):
         self.repo.get_by_id.return_value = None
 
         data = ScheduleAuctionSchema(
-            start_date=datetime.now() + timedelta(hours=1),
-            end_date=datetime.now() + timedelta(hours=3),
+            start_date=datetime.now(UTC) + timedelta(hours=1),
+            end_date=datetime.now(UTC) + timedelta(hours=3),
         )
 
         with pytest.raises(InvalidAuctionIdException):

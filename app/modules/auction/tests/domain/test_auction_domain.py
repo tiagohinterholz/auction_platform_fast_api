@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -89,10 +89,30 @@ class TestAuctionAggregate:
     @pytest.mark.parametrize(
         "status, start_time, end_time, expected_exception",
         [
-            (AuctionStatus.CREATED, datetime.now() + timedelta(hours=1), datetime.now() + timedelta(hours=3), None),
-            (AuctionStatus.ACTIVE,  datetime.now() + timedelta(hours=1), datetime.now() + timedelta(hours=3), InvalidAuctionStatusException),
-            (AuctionStatus.CREATED, datetime.now() + timedelta(hours=3), datetime.now() + timedelta(hours=1), InvalidAuctionStartTimeException),
-            (AuctionStatus.CREATED, datetime.now() - timedelta(hours=1), datetime.now() + timedelta(hours=3), InvalidAuctionStartTimeException),
+            (
+                AuctionStatus.CREATED,
+                datetime.now(UTC) + timedelta(hours=1),
+                datetime.now(UTC) + timedelta(hours=3),
+                None,
+            ),
+            (
+                AuctionStatus.ACTIVE,
+                datetime.now(UTC) + timedelta(hours=1),
+                datetime.now(UTC) + timedelta(hours=3),
+                InvalidAuctionStatusException,
+            ),
+            (
+                AuctionStatus.CREATED,
+                datetime.now(UTC) + timedelta(hours=3),
+                datetime.now(UTC) + timedelta(hours=1),
+                InvalidAuctionStartTimeException,
+            ),
+            (
+                AuctionStatus.CREATED,
+                datetime.now(UTC) - timedelta(hours=1),
+                datetime.now(UTC) + timedelta(hours=3),
+                InvalidAuctionStartTimeException,
+            ),
         ],
         ids=["valid", "wrong_status", "start_after_end", "start_in_past"],
     )
@@ -104,8 +124,10 @@ class TestAuctionAggregate:
         else:
             auction.schedule(start_time, end_time)
             assert auction.status == AuctionStatus.SCHEDULED
-            assert auction.start_time == start_time
-            assert auction.end_time == end_time
+            # schedule() stores naive (matching the TIMESTAMP WITHOUT TIME
+            # ZONE columns), even though the input here is UTC-aware.
+            assert auction.start_time == start_time.replace(tzinfo=None)
+            assert auction.end_time == end_time.replace(tzinfo=None)
             assert any(isinstance(event, AuctionScheduledEvent) for event in auction.events)
     
     

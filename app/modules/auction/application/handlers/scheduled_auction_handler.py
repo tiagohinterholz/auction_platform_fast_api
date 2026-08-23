@@ -1,3 +1,4 @@
+import math
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -27,8 +28,11 @@ class AuctionScheduledHandler:
         if end_time.tzinfo is None:
             end_time = end_time.replace(tzinfo=UTC)
 
-        start_delay = max(0, int((start_time - now).total_seconds()))
-        end_delay = max(0, int((end_time - now).total_seconds()))
+        # ceil, not int(): int() truncates the fractional second, which can
+        # fire the task up to ~1s BEFORE the target instant — and start()/
+        # finish() correctly reject "too early" when that happens.
+        start_delay = max(0, math.ceil((start_time - now).total_seconds()))
+        end_delay = max(0, math.ceil((end_time - now).total_seconds()))
 
         start_auction_task.apply_async(
             args=[auction_id],

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -16,7 +16,7 @@ def create_auction_payload(user_obj):
 
 @pytest.fixture
 def schedule_auction_payload():
-    now = datetime.now()
+    now = datetime.now(UTC)
     return {
         "start_date": (now + timedelta(hours=1)).isoformat(),
         "end_date": (now + timedelta(hours=3)).isoformat(),

@@ -9,5 +9,5 @@ class EventBusInterface(ABC):
         pass
 
     @abstractmethod
-    def subscribe(self, event_name: str, handler: Callable) -> None:
+    async def subscribe(self, event_name: str, handler: Callable) -> None:
         pass

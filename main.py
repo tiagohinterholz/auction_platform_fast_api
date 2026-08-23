@@ -8,13 +8,18 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.core.config import settings
 from app.core.database.session import AsyncSessionLocal
 from app.core.email.dependencies import get_email_service
+from app.core.events.event_bus_interface import EventBusInterface
 from app.core.events.in_memory_event_bus import InMemoryEventBus
+from app.core.events.rabbitmq_event_bus import RabbitMQEventBus
 from app.core.exceptions.error_handlers import setup_exception_handlers
 from app.core.logging.config import setup_logging
 from app.core.logging.middleware import APILoggingMiddleware, RequestIDMiddleware
 from app.core.redis.client import create_redis_client
 from app.core.sentry.config import setup_sentry
 from app.core.websockets.connection_manager import ConnectionManager
+from app.modules.auction.application.handlers.auction_finished_notification_handler import (
+    AuctionFinishedNotificationHandler,
+)
 from app.modules.auction.application.handlers.bid_placed_handler import (
     BidPlacedHandler as AuctionBidPlacedHandler,
 )
@@ -22,6 +27,7 @@ from app.modules.auction.application.handlers.cancelled_auction_handler import (
     AuctionCancelledHandler,
 )
 from app.modules.auction.application.handlers.created_auction_handler import AuctionCreatedHandler
+from app.modules.auction.application.handlers.finished_auction_handler import AuctionFinishedHandler
 from app.modules.auction.application.handlers.scheduled_auction_handler import (
     AuctionScheduledHandler,
 )
@@ -32,25 +38,35 @@ from app.modules.auction.infrastructure.repository.auction_read_repository impor
 from app.modules.auction.infrastructure.repository.auction_repository import AuctionRepository
 from app.modules.auction.routers.auction_routers import router as auction_router
 from app.modules.auth.routers.auth_router import router as auth_router
+from app.modules.bidding.application.handlers.auction_started_handler import (
+    AuctionStartedHandler as BiddingAuctionStartedHandler,
+)
 from app.modules.bidding.application.handlers.bid_placed_handler import (
     BidPlacedHandler as BiddingBidPlacedHandler,
 )
 from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
+from app.modules.bidding.infrastructure.repository.bidding_repository import BiddingRepository
 from app.modules.bidding.routers.bid_routers import router as bidding_router
-from app.modules.notifications.routers.notification_router import setup_notifications
+from app.modules.notifications.routers.notification_router import (
+    setup_notifications,
+    subscribe_notification_handlers,
+)
 from app.modules.users.application.handlers.user_created_welcome_email_handler import (
     UserCreatedWelcomeEmailHandler,
 )
+from app.modules.users.infrastructure.repository.users_repository import UserRepository
 from app.modules.users.routers.users_router import router as users_router
 
 setup_logging()
 setup_sentry()
 
-event_bus = InMemoryEventBus()
+event_bus = (
+    RabbitMQEventBus() if settings.EVENT_BUS_PROVIDER == "rabbitmq" else InMemoryEventBus()
+)
 connection_manager = ConnectionManager()
 
 
-def wire_event_handlers(bus: InMemoryEventBus, session_factory) -> None:
+async def wire_event_handlers(bus: EventBusInterface, session_factory) -> None:
     """Subscribes every domain event handler to `bus`, each opening its own
     session via `session_factory` (AsyncSessionLocal in production,
     TestSessionLocal in tests) — same wiring, different database.
@@ -67,6 +83,22 @@ def wire_event_handlers(bus: InMemoryEventBus, session_factory) -> None:
     async def on_auction_started(e):
         async with session_factory() as session:
             await AuctionStartedHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_auction_started_bidding(e):
+        async with session_factory() as session:
+            await BiddingAuctionStartedHandler(BiddingRepository(session)).handle(e)
+
+    async def on_auction_finished(e):
+        async with session_factory() as session:
+            await AuctionFinishedHandler(AuctionReadRepository(session)).handle(e)
+
+    async def on_auction_finished_notification(e):
+        async with session_factory() as session:
+            await AuctionFinishedNotificationHandler(
+                bid_read_repository=BidReadRepository(session),
+                users_repository=UserRepository(session),
+                email_service=get_email_service(),
+            ).handle(e)
 
     async def on_auction_cancelled(e):
         async with session_factory() as session:
@@ -87,13 +119,16 @@ def wire_event_handlers(bus: InMemoryEventBus, session_factory) -> None:
     async def on_user_created_welcome_email(e):
         await UserCreatedWelcomeEmailHandler(get_email_service()).handle(e)
 
-    bus.subscribe("AuctionCreatedEvent", on_auction_created)
-    bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
-    bus.subscribe("AuctionStartedEvent", on_auction_started)
-    bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
-    bus.subscribe("BidPlacedEvent", on_bid_placed_auction)
-    bus.subscribe("BidPlacedEvent", on_bid_placed_bidding)
-    bus.subscribe("UserCreatedEvent", on_user_created_welcome_email)
+    await bus.subscribe("AuctionCreatedEvent", on_auction_created)
+    await bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
+    await bus.subscribe("AuctionStartedEvent", on_auction_started)
+    await bus.subscribe("AuctionStartedEvent", on_auction_started_bidding)
+    await bus.subscribe("AuctionFinishedEvent", on_auction_finished)
+    await bus.subscribe("AuctionFinishedEvent", on_auction_finished_notification)
+    await bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
+    await bus.subscribe("BidPlacedEvent", on_bid_placed_auction)
+    await bus.subscribe("BidPlacedEvent", on_bid_placed_bidding)
+    await bus.subscribe("UserCreatedEvent", on_user_created_welcome_email)
 
 
 @asynccontextmanager
@@ -102,7 +137,8 @@ async def lifespan(app: FastAPI):
     app.state.event_bus = event_bus
     app.state.connection_manager = connection_manager
 
-    wire_event_handlers(event_bus, AsyncSessionLocal)
+    await wire_event_handlers(event_bus, AsyncSessionLocal)
+    await subscribe_notification_handlers(connection_manager, event_bus)
 
     yield
 
@@ -122,7 +158,7 @@ app.include_router(auction_router, prefix="/api/v1")
 app.include_router(bidding_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(
-    setup_notifications(manager=connection_manager, bus=event_bus),
+    setup_notifications(manager=connection_manager),
     prefix="/api/v1",
 )
 

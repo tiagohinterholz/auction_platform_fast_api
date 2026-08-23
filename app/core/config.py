@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     MAILPIT_SMTP_HOST: str = "mailpit"
     MAILPIT_SMTP_PORT: int = 1025
     RESEND_API_KEY: str | None = None
+    EVENT_BUS_PROVIDER: str = "memory"
+    RABBITMQ_URL: str = "amqp://guest:guest@rabbitmq:5672/"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

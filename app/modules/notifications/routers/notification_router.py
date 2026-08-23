@@ -1,6 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.core.events.in_memory_event_bus import InMemoryEventBus
+from app.core.events.event_bus_interface import EventBusInterface
 from app.core.websockets.connection_manager import ConnectionManager
 from app.modules.auction.domain.events.auction_events import (
     AuctionCancelledEvent,
@@ -14,7 +14,7 @@ from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
 router = APIRouter(tags=["Notifications"])
 
 
-def setup_notifications(manager: ConnectionManager, bus: InMemoryEventBus) -> APIRouter:
+def setup_notifications(manager: ConnectionManager) -> APIRouter:
 
     @router.websocket("/ws/auctions/{auction_id}")
     async def websocket_endpoint(websocket: WebSocket, auction_id: str):
@@ -25,6 +25,11 @@ def setup_notifications(manager: ConnectionManager, bus: InMemoryEventBus) -> AP
         except WebSocketDisconnect:
             manager.disconnect(websocket, auction_id)
 
+    return router
+
+async def subscribe_notification_handlers(
+    manager: ConnectionManager, bus: EventBusInterface
+) -> None:
     async def on_bid_placed(event: BidPlacedEvent) -> None:
         auction_id = str(event.payload["auction_id"])
         await manager.broadcast(auction_id, "bidPlaced", event.payload)
@@ -48,12 +53,12 @@ def setup_notifications(manager: ConnectionManager, bus: InMemoryEventBus) -> AP
     async def on_auction_extended(event: AuctionExtendedEvent) -> None:
         auction_id = str(event.payload["id"])
         await manager.broadcast(auction_id, "auctionExtended", event.payload)
+    
+    await bus.subscribe("BidPlacedEvent", on_bid_placed)
+    await bus.subscribe("AuctionStartedEvent", on_auction_started)
+    await bus.subscribe("AuctionFinishedEvent", on_auction_finished)
+    await bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
+    await bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
+    await bus.subscribe("AuctionExtendedEvent", on_auction_extended)
 
-    bus.subscribe("BidPlacedEvent", on_bid_placed)
-    bus.subscribe("AuctionStartedEvent", on_auction_started)
-    bus.subscribe("AuctionFinishedEvent", on_auction_finished)
-    bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
-    bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
-    bus.subscribe("AuctionExtendedEvent", on_auction_extended)
-
-    return router
+    

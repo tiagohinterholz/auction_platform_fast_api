@@ -8,7 +8,7 @@ class InMemoryEventBus(EventBusInterface):
     def __init__(self):
         self._handlers: dict[str, list[Callable]] = {}
 
-    def subscribe(self, event_name: str, handler: Callable) -> None:
+    async def subscribe(self, event_name: str, handler: Callable) -> None:
         handlers = self._handlers.get(event_name, [])
         handlers.append(handler)
         self._handlers[event_name] = handlers

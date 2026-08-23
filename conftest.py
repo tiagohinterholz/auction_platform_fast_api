@@ -2,6 +2,7 @@ import os
 
 os.environ["SENTRY_DSN"] = ""
 os.environ["EMAIL_PROVIDER"] = "console"
+os.environ["EVENT_BUS_PROVIDER"] = "memory"
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -73,7 +74,7 @@ async def client(db_session: AsyncSession):
     # Same handler wiring main.py's lifespan does for production, pointed at
     # the test database instead — without this, event-driven side effects
     # (read model updates, websocket broadcasts) never ran in any test here.
-    wire_event_handlers(event_bus, TestSessionLocal)
+    await wire_event_handlers(event_bus, TestSessionLocal)
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"

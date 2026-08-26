@@ -23,3 +23,7 @@ settings.json
 #IA
 .codex
 AGENTS.md
+
+# Dados gerados por scripts/seed_load_test.py (tokens de acesso, IDs) —
+# reproduzíveis a qualquer momento rodando o script de novo.
+scripts/loadtest_data/

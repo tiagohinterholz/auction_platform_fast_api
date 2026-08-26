@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     EVENT_BUS_PROVIDER: str = "memory"
     RABBITMQ_URL: str = "amqp://guest:guest@rabbitmq:5672/"
     OTEL_EXPORTER_ENDPOINT: str = "http://jaeger:4317"
+    API_WORKER_COUNT: int = 2
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

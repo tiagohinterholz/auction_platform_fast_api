@@ -88,6 +88,14 @@ services:
     ports:
       - "5672:5672" # AMQP
       - "15672:15672" # Management UI
+  
+  jaegger:
+    image: jaegertracing/all-in-one:latest
+    container_name: fastapi_auction_jaeger
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4317:4317"    # OTLP gRPC (é por aqui que a app manda os spans)
+      - "4318:4318"
       
 volumes:
   postgres_data:

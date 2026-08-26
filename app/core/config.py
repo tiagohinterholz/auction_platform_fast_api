@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     RESEND_API_KEY: str | None = None
     EVENT_BUS_PROVIDER: str = "memory"
     RABBITMQ_URL: str = "amqp://guest:guest@rabbitmq:5672/"
+    OTEL_EXPORTER_ENDPOINT: str = "http://jaeger:4317"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

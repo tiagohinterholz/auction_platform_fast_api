@@ -1,4 +1,6 @@
+import asyncio
 import json
+import logging
 from collections.abc import Callable
 from types import SimpleNamespace
 
@@ -7,7 +9,11 @@ import aio_pika
 from app.core.config import settings
 from app.core.events.event_bus_interface import EventBusInterface
 
+logger = logging.getLogger(__name__)
+
 EXCHANGE_NAME = "domain_events"
+CONNECT_MAX_ATTEMPTS = 10
+CONNECT_RETRY_DELAY_SECONDS = 3
 
 
 class RabbitMQEventBus(EventBusInterface):
@@ -17,13 +23,24 @@ class RabbitMQEventBus(EventBusInterface):
         self._channel: aio_pika.abc.AbstractChannel | None = None
         self._exchange: aio_pika.abc.AbstractExchange | None = None
 
+    async def _connect(self) -> aio_pika.abc.AbstractRobustConnection:
+        last_error: Exception | None = None
+        for attempt in range(1, CONNECT_MAX_ATTEMPTS + 1):
+            try:
+                return await aio_pika.connect_robust(self._url)
+            except Exception as exc:
+                last_error = exc
+                if attempt == CONNECT_MAX_ATTEMPTS:
+                    break
+                logger.warning(
+                    f"RabbitMQ connect attempt {attempt}/{CONNECT_MAX_ATTEMPTS} failed "
+                    f"({exc}); retrying in {CONNECT_RETRY_DELAY_SECONDS}s"
+                )
+                await asyncio.sleep(CONNECT_RETRY_DELAY_SECONDS)
+        assert last_error is not None
+        raise last_error
+
     async def _get_exchange(self) -> aio_pika.abc.AbstractExchange:
-        # A cached connection/channel is only safe to reuse within the same
-        # event loop that created it. Celery tasks each run their own
-        # asyncio.run() — a brand-new loop every call — so a connection
-        # opened by an earlier task is already closed by the time a later
-        # task (same process, same RabbitMQEventBus instance) reaches here.
-        # Detect that and reconnect instead of handing back a dead exchange.
         if (
             self._exchange is not None
             and self._connection is not None
@@ -31,7 +48,7 @@ class RabbitMQEventBus(EventBusInterface):
         ):
             return self._exchange
 
-        self._connection = await aio_pika.connect_robust(self._url)
+        self._connection = await self._connect()
         self._channel = await self._connection.channel()
         self._exchange = await self._channel.declare_exchange(
             EXCHANGE_NAME, aio_pika.ExchangeType.TOPIC, durable=True

@@ -54,11 +54,19 @@ async def subscribe_notification_handlers(
         auction_id = str(event.payload["id"])
         await manager.broadcast(auction_id, "auctionExtended", event.payload)
     
-    await bus.subscribe("BidPlacedEvent", on_bid_placed)
-    await bus.subscribe("AuctionStartedEvent", on_auction_started)
-    await bus.subscribe("AuctionFinishedEvent", on_auction_finished)
-    await bus.subscribe("AuctionCancelledEvent", on_auction_cancelled)
-    await bus.subscribe("AuctionScheduledEvent", on_auction_scheduled)
-    await bus.subscribe("AuctionExtendedEvent", on_auction_extended)
+    # broadcast=True: these handlers only act on WebSocket connections held
+    # in THIS process's ConnectionManager (in-memory, per-process). With a
+    # single uvicorn worker that's moot, but with --workers N a normal
+    # (competing-consumer) subscription would deliver each event to a
+    # single, arbitrarily-picked worker - silently dropping the
+    # notification for any client connected to a different one. Broadcast
+    # gives every worker its own copy; ConnectionManager.broadcast() already
+    # no-ops safely if this process holds no connection for that auction_id.
+    await bus.subscribe("BidPlacedEvent", on_bid_placed, broadcast=True)
+    await bus.subscribe("AuctionStartedEvent", on_auction_started, broadcast=True)
+    await bus.subscribe("AuctionFinishedEvent", on_auction_finished, broadcast=True)
+    await bus.subscribe("AuctionCancelledEvent", on_auction_cancelled, broadcast=True)
+    await bus.subscribe("AuctionScheduledEvent", on_auction_scheduled, broadcast=True)
+    await bus.subscribe("AuctionExtendedEvent", on_auction_extended, broadcast=True)
 
     

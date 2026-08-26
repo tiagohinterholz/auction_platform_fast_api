@@ -86,17 +86,41 @@ class RabbitMQEventBus(EventBusInterface):
                 )
                 await exchange.publish(message, routing_key=event_name)
 
-    async def subscribe(self, event_name: str, handler: Callable) -> None:
+    async def subscribe(
+        self, event_name: str, handler: Callable, broadcast: bool = False
+    ) -> None:
         exchange = await self._get_exchange()
         channel = self._channel
         assert channel is not None
 
         # AMQP queue names only allow [a-zA-Z0-9-_.:@#,/+ ] — a closure's
         # __qualname__ (e.g. "wire_event_handlers.<locals>.on_auction_created")
-        # has <> in it, which RabbitMQ rejects outright.
+        # has <> in it, which RabbitMQ rejects outright. Also used below to
+        # name this handler's span, regardless of which queue type it gets.
         safe_qualname = handler.__qualname__.replace("<locals>", "locals")
-        queue_name = f"{EXCHANGE_NAME}.{event_name}.{safe_qualname}"
-        queue = await channel.declare_queue(queue_name, durable=True)
+
+        if broadcast:
+            # No name, exclusive, auto_delete: RabbitMQ generates a unique
+            # queue for THIS connection alone, and deletes it the moment
+            # this connection closes. With uvicorn --workers N, each worker
+            # process holds its own RabbitMQEventBus/connection, so each one
+            # ends up with its own private queue bound to the same routing
+            # key - every worker gets its own copy of every matching event,
+            # instead of the message going to a single, arbitrarily-picked
+            # worker. Needed by handlers whose effect depends on per-process
+            # state (WebSocket connections held only in this process's
+            # ConnectionManager) - see EventBusInterface.subscribe's
+            # docstring for the full "why".
+            queue = await channel.declare_queue(exclusive=True, auto_delete=True)
+        else:
+            # Durable, fixed name shared by every subscriber process: this
+            # is RabbitMQ's normal competing-consumers behavior, where each
+            # matching event goes to exactly ONE of the bound queues/workers
+            # - correct for handlers that write to the DB, where two workers
+            # both processing the same event would double the write.
+            queue_name = f"{EXCHANGE_NAME}.{event_name}.{safe_qualname}"
+            queue = await channel.declare_queue(queue_name, durable=True)
+
         await queue.bind(exchange, routing_key=event_name)
 
         async def _on_message(message: aio_pika.abc.AbstractIncomingMessage) -> None:

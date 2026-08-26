@@ -154,7 +154,7 @@ app = FastAPI(
     redirect_slashes=False,
 )
 
-setup_tracing(app)
+setup_tracing("auction-platform-api", app)
 
 app.include_router(users_router, prefix="/api/v1")
 app.include_router(auction_router, prefix="/api/v1")

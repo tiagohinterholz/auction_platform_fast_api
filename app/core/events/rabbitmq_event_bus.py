@@ -5,11 +5,14 @@ from collections.abc import Callable
 from types import SimpleNamespace
 
 import aio_pika
+from opentelemetry import propagate, trace
+from opentelemetry.trace import SpanKind
 
 from app.core.config import settings
 from app.core.events.event_bus_interface import EventBusInterface
 
 logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
 
 EXCHANGE_NAME = "domain_events"
 CONNECT_MAX_ATTEMPTS = 10
@@ -59,11 +62,29 @@ class RabbitMQEventBus(EventBusInterface):
         exchange = await self._get_exchange()
 
         for event in events:
-            message = aio_pika.Message(
-                body=event.model_dump_json().encode(),
-                delivery_mode=aio_pika.DeliveryMode.PERSISTENT,  # survives a broker restart too
-            )
-            await exchange.publish(message, routing_key=type(event).__name__)
+            event_name = type(event).__name__
+
+            # RabbitMQ has no built-in way to carry an OTel trace context the
+            # way HTTP headers or Celery's own task headers do — aio-pika
+            # gives us a plain dict of AMQP message headers, so that's where
+            # we manually stash it. `propagate.inject` reads whatever span is
+            # currently active (e.g. the HTTP request span that triggered
+            # this publish) and writes the W3C `traceparent` string into the
+            # dict we hand it.
+            headers: dict = {}
+            with tracer.start_as_current_span(
+                f"{event_name} publish",
+                kind=SpanKind.PRODUCER,
+                attributes={"messaging.system": "rabbitmq", "messaging.destination": event_name},
+            ):
+                propagate.inject(headers)
+
+                message = aio_pika.Message(
+                    body=event.model_dump_json().encode(),
+                    delivery_mode=aio_pika.DeliveryMode.PERSISTENT,  # survives a broker restart too
+                    headers=headers,
+                )
+                await exchange.publish(message, routing_key=event_name)
 
     async def subscribe(self, event_name: str, handler: Callable) -> None:
         exchange = await self._get_exchange()
@@ -80,9 +101,27 @@ class RabbitMQEventBus(EventBusInterface):
 
         async def _on_message(message: aio_pika.abc.AbstractIncomingMessage) -> None:
             async with message.process():
+                # Mirror of publish()'s inject: `extract` reads the
+                # `traceparent` string back out of the AMQP headers and
+                # rebuilds a SpanContext from it. Passing that as `context=`
+                # to start_as_current_span is what makes this new span a
+                # CHILD of the original publisher's span instead of the
+                # start of a brand new, disconnected trace — this is the
+                # actual link between the API process and the worker process.
+                ctx = propagate.extract(message.headers or {})
                 data = json.loads(message.body)
                 event = SimpleNamespace(name=data.get("name"), payload=data["payload"])
-                await handler(event)
+
+                with tracer.start_as_current_span(
+                    f"{event_name} handle ({safe_qualname})",
+                    context=ctx,
+                    kind=SpanKind.CONSUMER,
+                    attributes={
+                        "messaging.system": "rabbitmq",
+                        "messaging.destination": event_name,
+                    },
+                ):
+                    await handler(event)
 
         await queue.consume(_on_message)
 

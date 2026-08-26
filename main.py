@@ -16,6 +16,7 @@ from app.core.logging.config import setup_logging
 from app.core.logging.middleware import APILoggingMiddleware, RequestIDMiddleware
 from app.core.redis.client import create_redis_client
 from app.core.sentry.config import setup_sentry
+from app.core.tracing.config import setup_tracing
 from app.core.websockets.connection_manager import ConnectionManager
 from app.modules.auction.application.handlers.auction_finished_notification_handler import (
     AuctionFinishedNotificationHandler,
@@ -152,6 +153,8 @@ app = FastAPI(
     lifespan=lifespan,
     redirect_slashes=False,
 )
+
+setup_tracing(app)
 
 app.include_router(users_router, prefix="/api/v1")
 app.include_router(auction_router, prefix="/api/v1")

@@ -3,6 +3,7 @@ import os
 os.environ["SENTRY_DSN"] = ""
 os.environ["EMAIL_PROVIDER"] = "console"
 os.environ["EVENT_BUS_PROVIDER"] = "memory"
+os.environ["OTEL_EXPORTER_ENDPOINT"] = ""
 
 import pytest
 from httpx import ASGITransport, AsyncClient

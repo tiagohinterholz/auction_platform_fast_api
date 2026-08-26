@@ -89,7 +89,7 @@ services:
       - "5672:5672" # AMQP
       - "15672:15672" # Management UI
   
-  jaegger:
+  jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: fastapi_auction_jaeger
     ports:

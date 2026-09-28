@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -47,7 +48,20 @@ class PlaceBidUseCase:
             
             if auction.status != AuctionStatus.ACTIVE:
                 raise InvalidBidPlaceException("Cannot place a bid on an inactive auction.")
-            
+
+            # Belt-and-suspenders against auctions whose status was never
+            # flipped to FINISHED by the Celery task (e.g. seeded directly
+            # into the DB, or the task silently failing/lost) - status alone
+            # isn't enough proof the auction is still actually open.
+            if auction.end_time is not None:
+                end_time = auction.end_time
+                if end_time.tzinfo is None:
+                    end_time = end_time.replace(tzinfo=UTC)
+                if end_time <= datetime.now(UTC):
+                    raise InvalidBidPlaceException(
+                        "Cannot place a bid on an auction that has already ended."
+                    )
+
             bidding = await self.bidding_repository.find_by_auction_id(str(auction_id))
             if not bidding:
                 bidding = Bidding.open(

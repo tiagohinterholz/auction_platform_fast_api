@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -26,7 +26,7 @@ def _make_active_auction(end_time: datetime) -> Auction:
         minimum_increment=Decimal("10.00"),
         status=AuctionStatus.ACTIVE,
         images=[],
-        start_time=datetime.now() - timedelta(hours=1),
+        start_time=datetime.now(UTC).replace(tzinfo=None) - timedelta(hours=1),
         end_time=end_time,
     )
 
@@ -45,7 +45,9 @@ class TestAuctionBidPlacedHandler:
         )
 
     async def test_updates_highest_bid_on_the_read_model(self):
-        auction = _make_active_auction(end_time=datetime.now() + timedelta(hours=1))
+        auction = _make_active_auction(
+            end_time=datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1)
+        )
         self.write_repo.get_by_id.return_value = auction
         read_model = SimpleNamespace(highest_bid=None, end_time=None)
         self.read_repo.get_by_id.return_value = read_model
@@ -59,7 +61,9 @@ class TestAuctionBidPlacedHandler:
         self.event_bus.publish.assert_called_once()
 
     async def test_extends_end_time_and_publishes_extended_event_near_the_deadline(self):
-        auction = _make_active_auction(end_time=datetime.now() + timedelta(seconds=10))
+        auction = _make_active_auction(
+            end_time=datetime.now(UTC).replace(tzinfo=None) + timedelta(seconds=10)
+        )
         self.write_repo.get_by_id.return_value = auction
         self.read_repo.get_by_id.return_value = SimpleNamespace(highest_bid=None, end_time=None)
 

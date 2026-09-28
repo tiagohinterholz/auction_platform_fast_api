@@ -34,8 +34,10 @@ class BidReadRepository(IBidReadRepository):
 
     async def find_all_by_auction_id(self, auction_id: str) -> Sequence[BidReadModel]:
         result = await self.session.execute(
-            select(BidReadEntity).where(BidReadEntity.auction_id == auction_id)
+            select(BidReadEntity)
+            .where(BidReadEntity.auction_id == auction_id)
+            .order_by(BidReadEntity.timestamp.desc())
         )
         bid_entities = result.scalars().all()
-        
+
         return [self._to_domain(model) for model in bid_entities]

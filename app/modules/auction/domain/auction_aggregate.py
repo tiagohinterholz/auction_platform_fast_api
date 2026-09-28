@@ -242,7 +242,10 @@ class Auction:
 
         diff_seconds = (end_time - current_time).total_seconds()
 
-        if diff_seconds <= 30:
+        # Negative means the auction already ended some time ago (e.g. its
+        # FINISHED transition never ran) - extending it would revive a dead
+        # auction instead of protecting a genuinely close one.
+        if 0 <= diff_seconds <= 30:
             # Column is TIMESTAMP WITHOUT TIME ZONE — store naive, same rule
             # start()/finish() already follow.
             self._end_time = (current_time + timedelta(seconds=60)).replace(tzinfo=None)

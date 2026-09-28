@@ -2,7 +2,9 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
+
+from app.core.schemas.timezone import as_utc
 
 
 class AuctionSchema(BaseModel):
@@ -19,3 +21,8 @@ class AuctionSchema(BaseModel):
     images: list[str] | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("start_time", "end_time", mode="after")
+    @classmethod
+    def _tag_utc(cls, value: datetime | None) -> datetime | None:
+        return as_utc(value)

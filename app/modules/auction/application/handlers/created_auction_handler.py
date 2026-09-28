@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from app.modules.auction.domain.events.auction_events import AuctionCreatedEvent
-from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
+from app.modules.auction.infrastructure.persistence.auction_read_entity import AuctionReadEntity
 from app.modules.auction.infrastructure.repository.auction_read_repository import (
     AuctionReadRepository,
 )
@@ -12,7 +12,7 @@ class AuctionCreatedHandler:
         self.read_repository = read_repository
 
     async def handle(self, event: AuctionCreatedEvent) -> None:
-        auction = AuctionReadModel(
+        auction = AuctionReadEntity(
             id=event.payload["id"],
             user_id=event.payload["user_id"],
             title=event.payload["title"],

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database.base import Base
 
 
-class AuctionReadModel(Base):
+class AuctionReadEntity(Base):
     __tablename__ = "auctions_read"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

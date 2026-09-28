@@ -6,7 +6,7 @@ import pytest
 
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
 from app.modules.auction.infrastructure.persistence.auction_model import AuctionModel
-from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
+from app.modules.auction.infrastructure.persistence.auction_read_entity import AuctionReadEntity
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def auction_factory(db_session, user_obj, faker):
             db_session.add(auction)
             await db_session.flush()
 
-            read_model = AuctionReadModel(
+            read_model = AuctionReadEntity(
                 id=auction.id,
                 title=_title,
                 description=_description,

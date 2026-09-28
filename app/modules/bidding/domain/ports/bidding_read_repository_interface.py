@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
-from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel
+from app.modules.bidding.domain.read_models.bid_read_model import BidReadModel
 
 
 class IBidReadRepository(ABC):

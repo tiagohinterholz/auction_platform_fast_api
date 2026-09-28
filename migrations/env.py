@@ -11,9 +11,9 @@ from app.core.config import settings
 from app.core.database.base import Base
 from app.modules.users.infrastructure.persistence.users_model import UserModel  # noqa
 from app.modules.auction.infrastructure.persistence.auction_model import AuctionModel  # noqa
-from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel  # noqa
+from app.modules.auction.infrastructure.persistence.auction_read_entity import AuctionReadEntity  # noqa
 from app.modules.bidding.infrastructure.persistence.bidding_model import BiddingModel  # noqa
-from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel  # noqa
+from app.modules.bidding.infrastructure.persistence.bid_read_entity import BidReadEntity  # noqa
 from app.modules.auth.infrastructure.persistence.refresh_token_model import RefreshTokenModel  # noqa   
 
 

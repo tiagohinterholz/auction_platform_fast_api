@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database.base import Base
 
 
-class BidReadModel(Base):
+class BidReadEntity(Base):
     __tablename__ = "bids_history"
 
     id: Mapped[uuid.UUID] = mapped_column(

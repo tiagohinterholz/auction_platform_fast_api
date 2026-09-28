@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
-from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
+from app.modules.auction.domain.read_models.auction_read_model import AuctionReadModel
 
 
 class IAuctionReadRepository(ABC):

@@ -10,9 +10,9 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 import app.modules.auction.infrastructure.persistence.auction_model
-import app.modules.auction.infrastructure.persistence.auction_read_model
+import app.modules.auction.infrastructure.persistence.auction_read_entity
 import app.modules.auth.infrastructure.persistence.refresh_token_model
-import app.modules.bidding.infrastructure.persistence.bid_read_model
+import app.modules.bidding.infrastructure.persistence.bid_read_entity
 import app.modules.bidding.infrastructure.persistence.bidding_model
 import app.modules.users.infrastructure.persistence.users_model  # noqa: F401
 from app.core.config import settings

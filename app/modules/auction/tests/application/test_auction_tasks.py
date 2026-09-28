@@ -8,8 +8,8 @@ from sqlalchemy import select
 from app.core.events.in_memory_event_bus import InMemoryEventBus
 from app.modules.auction.application.tasks.auction_tasks import _finish_auction, _start_auction
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
-from app.modules.auction.infrastructure.persistence.auction_read_model import AuctionReadModel
-from app.modules.bidding.infrastructure.persistence.bid_read_model import BidReadModel
+from app.modules.auction.infrastructure.persistence.auction_read_entity import AuctionReadEntity
+from app.modules.bidding.infrastructure.persistence.bid_read_entity import BidReadEntity
 from conftest import TestSessionLocal
 from main import wire_event_handlers
 
@@ -45,7 +45,7 @@ class TestFinishAuctionTask:
         await _finish_auction(str(auction.id), session_factory=TestSessionLocal, bus=wired_bus)
 
         result = await db_session.execute(
-            select(AuctionReadModel).where(AuctionReadModel.id == auction.id)
+            select(AuctionReadEntity).where(AuctionReadEntity.id == auction.id)
         )
         read_model = result.scalars().first()
         assert read_model.status == AuctionStatus.FINISHED.value
@@ -61,14 +61,14 @@ class TestFinishAuctionTask:
         )
         db_session.add_all(
             [
-                BidReadModel(
+                BidReadEntity(
                     id=uuid.uuid4(),
                     auction_id=auction.id,
                     user_id=user_obj.id,
                     amount=Decimal("150.00"),
                     timestamp=datetime.now(),
                 ),
-                BidReadModel(
+                BidReadEntity(
                     id=uuid.uuid4(),
                     auction_id=auction.id,
                     user_id=user_obj_admin.id,
@@ -84,7 +84,7 @@ class TestFinishAuctionTask:
         await _finish_auction(str(auction.id), session_factory=TestSessionLocal, bus=wired_bus)
 
         result = await db_session.execute(
-            select(AuctionReadModel).where(AuctionReadModel.id == auction.id)
+            select(AuctionReadEntity).where(AuctionReadEntity.id == auction.id)
         )
         assert result.scalars().first().status == AuctionStatus.FINISHED.value
 
@@ -104,6 +104,6 @@ class TestStartAuctionTask:
         await _start_auction(str(auction.id), session_factory=TestSessionLocal, bus=wired_bus)
 
         result = await db_session.execute(
-            select(AuctionReadModel).where(AuctionReadModel.id == auction.id)
+            select(AuctionReadEntity).where(AuctionReadEntity.id == auction.id)
         )
         assert result.scalars().first().status == AuctionStatus.ACTIVE.value

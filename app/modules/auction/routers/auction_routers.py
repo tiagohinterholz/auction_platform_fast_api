@@ -1,6 +1,6 @@
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, status
 
@@ -86,7 +86,7 @@ async def cancel_auction(
 ) -> AuctionSchema:
     auction = await usecase.execute(
         id=auction_id,
-        current_date=datetime.now(),
+        current_date=datetime.now(UTC),
         reason=data.reason,
     )
     return AuctionSchema.model_validate(auction)

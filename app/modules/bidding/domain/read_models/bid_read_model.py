@@ -9,5 +9,5 @@ class BidReadModel:
     id: uuid.UUID
     auction_id: uuid.UUID
     user_id: uuid.UUID
-    amount: Decimal | None
-    timestamp: datetime | None
+    amount: Decimal
+    timestamp: datetime

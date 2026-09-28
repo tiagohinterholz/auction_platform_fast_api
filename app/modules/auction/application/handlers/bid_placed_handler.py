@@ -1,19 +1,19 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from app.core.events.event_bus_interface import EventBusInterface
-from app.modules.auction.infrastructure.repository.auction_read_repository import (
-    AuctionReadRepository,
+from app.modules.auction.domain.ports.auction_read_repository_interface import (
+    IAuctionReadRepository,
 )
-from app.modules.auction.infrastructure.repository.auction_repository import AuctionRepository
+from app.modules.auction.domain.ports.auction_repository_interface import IAuctionRepository
 from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
 
 
 class BidPlacedHandler:
     def __init__(
         self,
-        write_repository: AuctionRepository,
-        read_repository: AuctionReadRepository,
+        write_repository: IAuctionRepository,
+        read_repository: IAuctionReadRepository,
         event_bus: EventBusInterface,
     ):
         self.write_repository = write_repository
@@ -27,7 +27,7 @@ class BidPlacedHandler:
         if not auction:
             return
 
-        auction.apply_anti_sniping(datetime.now())
+        auction.apply_anti_sniping(datetime.now(UTC))
         await self.write_repository.save(auction)
 
         current_auction = await self.read_repository.get_by_id(auction_id)

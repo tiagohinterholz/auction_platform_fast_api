@@ -29,6 +29,7 @@ class AuctionReadRepository(IAuctionReadRepository):
             highest_bid=model.highest_bid,
             end_time=model.end_time,
             status=AuctionStatus(model.status),
+            reason=model.reason,
             images=model.images or [],
             )
 

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from app.modules.bidding.domain.events.bid_events import BidPlacedEvent
@@ -23,11 +23,17 @@ class Bidding:
         self._auction_id = auction_id
         self._last_user_id = last_user_id
         self._last_amount = last_amount
-        self._timestamp = timestamp or datetime.now()
+        # Column is TIMESTAMP WITHOUT TIME ZONE, so this must stay naive - but
+        # computed from UTC, not the server's local time (datetime.now() with
+        # no tz would silently store the server's local wall-clock as if it
+        # were UTC, offsetting every stored timestamp by the server's zone).
+        self._timestamp = timestamp or datetime.now(UTC).replace(tzinfo=None)
         self.events: list = []
 
     @classmethod
-    def open(cls, auction_id: uuid.UUID, starting_price: Decimal, minimum_increment: Decimal) -> "Bidding":
+    def open(
+        cls, auction_id: uuid.UUID, starting_price: Decimal, minimum_increment: Decimal
+    ) -> "Bidding":
         return cls(
             auction_id=auction_id,
             current_price=starting_price,
@@ -51,7 +57,7 @@ class Bidding:
         self._last_user_id = user_id
         self._last_amount = amount
         self._current_price = amount
-        self._timestamp = datetime.now()
+        self._timestamp = datetime.now(UTC).replace(tzinfo=None)
         self.events.append(
             BidPlacedEvent(
                 payload={

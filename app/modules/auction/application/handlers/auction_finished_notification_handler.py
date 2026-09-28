@@ -3,8 +3,8 @@ from decimal import Decimal
 
 from app.core.email.email_service_interface import IEmailService
 from app.modules.auction.domain.events.auction_events import AuctionFinishedEvent
-from app.modules.bidding.infrastructure.repository.bid_read_repository import BidReadRepository
-from app.modules.users.infrastructure.repository.users_repository import UserRepository
+from app.modules.bidding.domain.ports.bidding_read_repository_interface import IBidReadRepository
+from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +16,8 @@ class AuctionFinishedNotificationHandler:
 
     def __init__(
         self,
-        bid_read_repository: BidReadRepository,
-        users_repository: UserRepository,
+        bid_read_repository: IBidReadRepository,
+        users_repository: IUsersRepository,
         email_service: IEmailService,
     ):
         self.bid_read_repository = bid_read_repository

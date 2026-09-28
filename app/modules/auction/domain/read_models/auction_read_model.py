@@ -16,4 +16,5 @@ class AuctionReadModel:
     highest_bid: Decimal | None
     start_time: datetime | None
     end_time: datetime | None
+    reason: str | None
     images: list[str] | None

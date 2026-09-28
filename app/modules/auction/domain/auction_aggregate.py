@@ -234,10 +234,18 @@ class Auction:
         if not self._end_time:
             return
 
-        diff_seconds = (self._end_time - current_time).total_seconds()
+        end_time = self._as_aware(self._end_time)
+        if end_time is None:
+            return
+        if current_time.tzinfo is None:
+            current_time = current_time.replace(tzinfo=UTC)
+
+        diff_seconds = (end_time - current_time).total_seconds()
 
         if diff_seconds <= 30:
-            self._end_time = current_time + timedelta(seconds=60)
+            # Column is TIMESTAMP WITHOUT TIME ZONE — store naive, same rule
+            # start()/finish() already follow.
+            self._end_time = (current_time + timedelta(seconds=60)).replace(tzinfo=None)
             self.events.append(
                 AuctionExtendedEvent(
                     payload={

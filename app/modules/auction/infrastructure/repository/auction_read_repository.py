@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 
+from sqlalchemy import case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -45,6 +46,7 @@ class AuctionReadRepository(IAuctionReadRepository):
             end_time=model.end_time,
             highest_bid=model.highest_bid,
             status=model.status,
+            reason=model.reason,
             images=model.images,
         )
         await self.session.merge(auction_read_entity)
@@ -59,7 +61,17 @@ class AuctionReadRepository(IAuctionReadRepository):
         return self._to_domain(auction_entity)
 
     async def get_all(self) -> Sequence[AuctionReadModel]:
-        query = select(AuctionReadEntity)
+        # Active first, then scheduled (soonest start first), then anything
+        # over (finished or cancelled - both dumped in the same last group,
+        # order between them doesn't matter here).
+        status_priority = case(
+            (AuctionReadEntity.status == "active", 0),
+            (AuctionReadEntity.status == "scheduled", 1),
+            else_=2,
+        )
+        query = select(AuctionReadEntity).order_by(
+            status_priority, AuctionReadEntity.start_time.asc()
+        )
         result = await self.session.execute(query)
         auction_entities = result.scalars().all()
         return [self._to_domain(model) for model in auction_entities]

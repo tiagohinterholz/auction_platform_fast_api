@@ -123,3 +123,38 @@ class TestAuthRouters(RequestMixin):
         response = await request.post("/auth/logout", json={"refresh_token": "irrelevant"})
 
         assert response.status_code == 401
+
+    async def test_unauthenticated_error_uses_the_standard_envelope(self, client):
+        request = RequestMixin.create(client)
+
+        response = await request.post("/auth/logout", json={"refresh_token": "irrelevant"})
+
+        assert response.json() == {
+            "message": "Not authenticated",
+            "error_type": "UnauthorizedError",
+        }
+        assert response.headers["www-authenticate"] == "Bearer"
+
+    async def test_validation_error_uses_the_standard_envelope(self, client, register_payload):
+        request = RequestMixin.create(client)
+        payload = {**register_payload, "password": "NoDigitsHere"}
+
+        response = await request.post("/auth/register", json=payload)
+
+        body = response.json()
+        assert response.status_code == 422
+        assert body["error_type"] == "ValidationError"
+        assert body["message"] == "password: Password must contain at least one digit."
+        assert body["errors"] == [
+            {"field": "password", "message": "Password must contain at least one digit."}
+        ]
+
+    async def test_validation_error_lists_every_invalid_field(self, client):
+        request = RequestMixin.create(client)
+
+        response = await request.post("/auth/register", json={})
+
+        body = response.json()
+        assert response.status_code == 422
+        assert isinstance(body["message"], str)
+        assert {error["field"] for error in body["errors"]} == {"name", "email", "cpf", "password"}

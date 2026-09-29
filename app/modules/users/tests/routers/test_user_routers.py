@@ -13,6 +13,16 @@ class TestUserRouters(RequestMixin):
         response = await request_auth.get("/users")
         assert response.status_code == 403
 
+    async def test_forbidden_error_uses_the_standard_envelope(self, client, user_obj):
+        request_auth = await self.authenticated(client, user_obj.email, "Pass@123")
+
+        response = await request_auth.get("/users")
+
+        assert response.json() == {
+            "message": "Admin access required",
+            "error_type": "ForbiddenError",
+        }
+
     async def test_get_user_by_id_returns_200(self, client, user_obj):
         request_auth = await self.authenticated(client, user_obj.email, "Pass@123")
         response = await request_auth.get(f"/users/{user_obj.id}")

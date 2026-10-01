@@ -1,6 +1,9 @@
 from app.core.events.event_bus_interface import EventBusInterface
 from app.modules.users.application.schemas.update_user_schema import UpdateUserSchema
-from app.modules.users.domain.exceptions.users_exceptions import UserNotFoundException
+from app.modules.users.domain.exceptions.users_exceptions import (
+    EmailAlreadyInUseException,
+    UserNotFoundException,
+)
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
 from app.modules.users.domain.users_aggregate import User
 
@@ -15,6 +18,11 @@ class UpdateUserUseCase:
 
         if not user:
             raise UserNotFoundException(user_id)
+
+        if data.email and data.email != user.email:
+            existing_user = await self.repository.get_by_email(data.email)
+            if existing_user:
+                raise EmailAlreadyInUseException(data.email)
 
         user.update(name=data.name, email=data.email)
         await self.repository.save(user)

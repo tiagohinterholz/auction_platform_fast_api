@@ -1,4 +1,4 @@
-from app.core.exceptions.exceptions import DomainException, NotFoundException
+from app.core.exceptions.exceptions import ConflictException, DomainException, NotFoundException
 
 
 class InvalidUserNameException(DomainException):
@@ -21,3 +21,8 @@ class InvalidUserCPFException(DomainException):
 class UserNotFoundException(NotFoundException):
     def __init__(self, user_id: str):
         super().__init__(f"User not found with ID {user_id}.")
+
+
+class EmailAlreadyInUseException(ConflictException):
+    def __init__(self, email: str):
+        super().__init__(f"Email {email} is already in use.")

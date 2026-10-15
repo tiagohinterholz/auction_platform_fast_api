@@ -10,7 +10,10 @@ from app.modules.users.application.usecases.get_all_users_usecase import GetAllU
 from app.modules.users.application.usecases.get_user_by_id_usecase import GetUserByIdUseCase
 from app.modules.users.application.usecases.update_user_usecase import UpdateUserUseCase
 from app.modules.users.domain.enums.user_role import UserRole
-from app.modules.users.domain.exceptions.users_exceptions import UserNotFoundException
+from app.modules.users.domain.exceptions.users_exceptions import (
+    EmailAlreadyInUseException,
+    UserNotFoundException,
+)
 from app.modules.users.domain.ports.users_repository_interface import IUsersRepository
 from app.modules.users.domain.users_aggregate import User
 
@@ -86,6 +89,7 @@ class TestUpdateUserUseCase(UserUseCaseBase):
     async def test_updates_and_saves(self):
         user = _make_user()
         self.repo.get_by_id.return_value = user
+        self.repo.get_by_email.return_value = None
 
         data = UpdateUserSchema(name="Jane Doe", email="jane.doe@example.com")
         result = await self.use_case.execute(str(user.id), data)
@@ -94,6 +98,31 @@ class TestUpdateUserUseCase(UserUseCaseBase):
         assert result.name == "Jane Doe"
         assert result.email == "jane.doe@example.com"
         self.event_bus.publish.assert_called_once()
+
+    async def test_raises_when_email_already_in_use(self):
+        user = _make_user()
+        other_user = _make_user()
+        self.repo.get_by_id.return_value = user
+        self.repo.get_by_email.return_value = other_user
+
+        data = UpdateUserSchema(email="taken@example.com")
+
+        with pytest.raises(EmailAlreadyInUseException):
+            await self.use_case.execute(str(user.id), data)
+        self.repo.save.assert_not_called()
+        self.event_bus.publish.assert_not_called()
+
+    async def test_skips_email_check_when_email_is_unchanged(self):
+        user = _make_user()
+        self.repo.get_by_id.return_value = user
+
+        data = UpdateUserSchema(name="Jane Doe", email=user.email)
+        result = await self.use_case.execute(str(user.id), data)
+
+        self.repo.get_by_email.assert_not_called()
+        self.repo.save.assert_called_once()
+        assert result.name == "Jane Doe"
+        assert result.email == "john.doe@example.com"
 
     async def test_raises_when_not_found(self):
         self.repo.get_by_id.return_value = None

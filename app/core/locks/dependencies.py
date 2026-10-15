@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends
 from redis.asyncio import Redis
 
@@ -7,6 +9,9 @@ from app.core.redis.client import get_redis_client
 
 
 def get_lock_service(
-    redis: Redis = Depends(get_redis_client),
+    redis: Annotated[Redis, Depends(get_redis_client)],
 ) -> ILockService:
     return RedisLockService(redis)
+
+
+LockServiceDep = Annotated[ILockService, Depends(get_lock_service)]

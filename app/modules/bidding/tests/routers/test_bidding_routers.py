@@ -29,6 +29,16 @@ class TestBiddingRouters(RequestMixin):
         )
         assert response.status_code == 200
 
+    async def test_create_bid_returns_401_when_unauthenticated(self, client, auction_obj_active):
+        request = RequestMixin.create(client)
+
+        response = await request.post(
+            f"/auctions/{auction_obj_active.id}/bids",
+            json={"amount": 150.0},
+        )
+
+        assert response.status_code == 401
+
     async def test_create_bid_returns_409_when_auction_is_locked(
         self, client, auction_obj_active, user_obj
     ):

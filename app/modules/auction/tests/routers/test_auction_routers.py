@@ -61,9 +61,42 @@ class TestAuctionRouters(RequestMixin):
         assert body["status"] == "created"
         assert body["highest_bid"] is None
 
-    async def test_create_auction_returns_401_when_unauthenticated(self, client, create_auction_payload):
+    async def test_create_auction_returns_401_when_unauthenticated(
+        self, client, create_auction_payload
+    ):
         request = RequestMixin.create(client)
         response = await request.post("/auctions", json=create_auction_payload)
+        assert response.status_code == 401
+
+    async def test_get_my_auctions_returns_401_when_unauthenticated(self, client):
+        request = RequestMixin.create(client)
+
+        response = await request.get("/auctions/me")
+
+        assert response.status_code == 401
+
+    async def test_schedule_auction_returns_401_when_unauthenticated(
+        self, client, auction_obj_created, schedule_auction_payload
+    ):
+        request = RequestMixin.create(client)
+
+        response = await request.patch(
+            f"/auctions/{auction_obj_created.id}/schedule",
+            json=schedule_auction_payload,
+        )
+
+        assert response.status_code == 401
+
+    async def test_cancel_auction_returns_401_when_unauthenticated(
+        self, client, auction_obj_scheduled, cancel_auction_payload
+    ):
+        request = RequestMixin.create(client)
+
+        response = await request.patch(
+            f"/auctions/{auction_obj_scheduled.id}/cancel",
+            json=cancel_auction_payload,
+        )
+
         assert response.status_code == 401
 
     async def test_schedule_nonexistent_auction_returns_404(

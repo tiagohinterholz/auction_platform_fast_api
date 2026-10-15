@@ -124,6 +124,15 @@ class TestAuthRouters(RequestMixin):
 
         assert response.status_code == 401
 
+    async def test_logout_returns_401_when_token_is_invalid(self, client):
+        request = RequestMixin.create(client, token="not-a-valid-jwt")
+
+        response = await request.post("/auth/logout", json={"refresh_token": "irrelevant"})
+
+        assert response.status_code == 401
+        assert response.json()["message"] == "Invalid or expired token"
+        assert response.headers["www-authenticate"] == "Bearer"
+
     async def test_unauthenticated_error_uses_the_standard_envelope(self, client):
         request = RequestMixin.create(client)
 

@@ -22,6 +22,7 @@ from app.modules.auction.domain.exceptions.auction_exceptions import (
     InvalidAuctionStartTimeException,
     InvalidAuctionStatusException,
     InvalidAuctionTitleException,
+    NotAuctionOwnerException,
 )
 
 
@@ -217,3 +218,14 @@ class TestAuctionAggregate:
         auction.apply_anti_sniping(current_time=now)
 
         assert not any(isinstance(e, AuctionExtendedEvent) for e in auction.events)
+
+    def test_ensure_owned_by_accepts_the_owner(self):
+        auction = _make_auction()
+
+        auction.ensure_owned_by(auction.user_id)
+
+    def test_ensure_owned_by_rejects_another_user(self):
+        auction = _make_auction()
+
+        with pytest.raises(NotAuctionOwnerException):
+            auction.ensure_owned_by(uuid.uuid4())

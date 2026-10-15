@@ -59,9 +59,9 @@ async def schedule_auction(
     auction_id: uuid.UUID,
     data: ScheduleAuctionSchema,
     usecase: ScheduleAuctionUseCaseDep,
-    _: CurrentUser,
+    current_user: CurrentUser,
 ) -> AuctionSchema:
-    auction = await usecase.execute(auction_id, data)
+    auction = await usecase.execute(auction_id, data, user_id=current_user.id)
     return AuctionSchema.model_validate(auction)
 
 
@@ -70,11 +70,12 @@ async def cancel_auction(
     auction_id: uuid.UUID,
     data: CancelAuctionSchema,
     usecase: CancelAuctionUseCaseDep,
-    _: CurrentUser,
+    current_user: CurrentUser,
 ) -> AuctionSchema:
     auction = await usecase.execute(
         id=auction_id,
         current_date=datetime.now(UTC),
+        user_id=current_user.id,
         reason=data.reason,
     )
     return AuctionSchema.model_validate(auction)

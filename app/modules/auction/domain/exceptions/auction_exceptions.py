@@ -1,6 +1,11 @@
 from decimal import Decimal
 
-from app.core.exceptions.exceptions import ConflictException, DomainException, NotFoundException
+from app.core.exceptions.exceptions import (
+    ConflictException,
+    DomainException,
+    ForbiddenException,
+    NotFoundException,
+)
 
 
 class InvalidAuctionTitleException(DomainException):
@@ -41,6 +46,11 @@ class InvalidAuctionStartTimeException(DomainException):
 class InvalidAuctionStatusException(ConflictException):
     def __init__(self, status: str):
         super().__init__(f"Invalid auction status: {status}")
+
+
+class NotAuctionOwnerException(ForbiddenException):
+    def __init__(self, auction_id: str):
+        super().__init__(f"Only the owner can modify auction {auction_id}.")
 
 
 class AuctionNotFoundException(NotFoundException):

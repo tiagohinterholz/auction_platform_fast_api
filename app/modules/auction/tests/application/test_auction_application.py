@@ -20,7 +20,10 @@ from app.modules.auction.application.usecases.schedule_auction_use_case import (
 from app.modules.auction.application.usecases.start_auction_use_case import StartAuctionUseCase
 from app.modules.auction.domain.auction_aggregate import Auction
 from app.modules.auction.domain.enums.auction_status import AuctionStatus
-from app.modules.auction.domain.exceptions.auction_exceptions import InvalidAuctionIdException
+from app.modules.auction.domain.exceptions.auction_exceptions import (
+    InvalidAuctionIdException,
+    NotAuctionOwnerException,
+)
 from app.modules.auction.domain.ports.auction_read_repository_interface import (
     IAuctionReadRepository,
 )
@@ -86,7 +89,7 @@ class TestScheduleAuctionUseCase(AuctionUseCaseBase):
             end_date=datetime.now(UTC) + timedelta(hours=3),
         )
 
-        await self.use_case.execute(uuid.uuid4(), data)
+        await self.use_case.execute(uuid.uuid4(), data, user_id=auction.user_id)
 
         self.repo.save.assert_called_once()
         self.bus.publish.assert_called_once()
@@ -100,7 +103,22 @@ class TestScheduleAuctionUseCase(AuctionUseCaseBase):
         )
 
         with pytest.raises(InvalidAuctionIdException):
-            await self.use_case.execute(uuid.uuid4(), data)
+            await self.use_case.execute(uuid.uuid4(), data, user_id=uuid.uuid4())
+
+    async def test_raises_when_user_is_not_the_owner(self):
+        auction = _make_auction(status=AuctionStatus.CREATED)
+        self.repo.get_by_id.return_value = auction
+
+        data = ScheduleAuctionSchema(
+            start_date=datetime.now(UTC) + timedelta(hours=1),
+            end_date=datetime.now(UTC) + timedelta(hours=3),
+        )
+
+        with pytest.raises(NotAuctionOwnerException):
+            await self.use_case.execute(uuid.uuid4(), data, user_id=uuid.uuid4())
+        assert auction.status == AuctionStatus.CREATED
+        self.repo.save.assert_not_called()
+        self.bus.publish.assert_not_called()
 
 
 class TestStartAuctionUseCase(AuctionUseCaseBase):
@@ -167,7 +185,9 @@ class TestCancelAuctionUseCase(AuctionUseCaseBase):
         )
         self.repo.get_by_id.return_value = auction
 
-        await self.use_case.execute(uuid.uuid4(), current_date=datetime.now(), reason="Motivo")
+        await self.use_case.execute(
+            uuid.uuid4(), current_date=datetime.now(), user_id=auction.user_id, reason="Motivo"
+        )
 
         self.repo.save.assert_called_once()
         self.bus.publish.assert_called_once()
@@ -176,7 +196,25 @@ class TestCancelAuctionUseCase(AuctionUseCaseBase):
         self.repo.get_by_id.return_value = None
 
         with pytest.raises(InvalidAuctionIdException):
-            await self.use_case.execute(uuid.uuid4(), current_date=datetime.now())
+            await self.use_case.execute(
+                uuid.uuid4(), current_date=datetime.now(), user_id=uuid.uuid4()
+            )
+
+    async def test_raises_when_user_is_not_the_owner(self):
+        auction = _make_auction(
+            status=AuctionStatus.SCHEDULED,
+            start_time=datetime.now(UTC) + timedelta(hours=1),
+            end_time=datetime.now(UTC) + timedelta(hours=2),
+        )
+        self.repo.get_by_id.return_value = auction
+
+        with pytest.raises(NotAuctionOwnerException):
+            await self.use_case.execute(
+                uuid.uuid4(), current_date=datetime.now(UTC), user_id=uuid.uuid4()
+            )
+        assert auction.status == AuctionStatus.SCHEDULED
+        self.repo.save.assert_not_called()
+        self.bus.publish.assert_not_called()
 
 
 class TestGetAuctionByIdUseCase:

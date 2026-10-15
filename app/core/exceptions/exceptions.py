@@ -18,6 +18,12 @@ class UnauthorizedException(DomainException):
     status_code = 401
 
 
+class ForbiddenException(DomainException):
+    """Authenticated, but not allowed to act on this resource. Maps to HTTP 403."""
+
+    status_code = 403
+
+
 class ConflictException(DomainException):
     """Request conflicts with the resource's current state. Maps to HTTP 409."""
 

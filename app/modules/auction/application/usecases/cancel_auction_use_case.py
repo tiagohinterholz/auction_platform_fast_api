@@ -19,12 +19,17 @@ class CancelAuctionUseCase:
         self._event_bus = event_bus
 
     async def execute(
-        self, id: uuid.UUID, current_date: datetime, reason: str | None = None
+        self,
+        id: uuid.UUID,
+        current_date: datetime,
+        user_id: uuid.UUID,
+        reason: str | None = None,
     ) -> Auction:
         auction = await self._repository.get_by_id(str(id))
         if not auction:
             raise InvalidAuctionIdException(f"Auction with id {id} not found.")
 
+        auction.ensure_owned_by(user_id)
         auction.cancel(current_date, reason)
         await self._repository.save(auction)
         events = auction.pull_events()

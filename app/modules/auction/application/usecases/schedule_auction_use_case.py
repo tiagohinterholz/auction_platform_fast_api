@@ -20,11 +20,14 @@ class ScheduleAuctionUseCase:
         self._repository = repository
         self._event_bus = event_bus
 
-    async def execute(self, id: uuid.UUID, data: ScheduleAuctionSchema) -> Auction:
+    async def execute(
+        self, id: uuid.UUID, data: ScheduleAuctionSchema, user_id: uuid.UUID
+    ) -> Auction:
         auction = await self._repository.get_by_id(str(id))
         if not auction:
             raise InvalidAuctionIdException(f"Auction with id {id} not found.")
 
+        auction.ensure_owned_by(user_id)
         auction.schedule(
             start_time=data.start_date,
             end_time=data.end_date,

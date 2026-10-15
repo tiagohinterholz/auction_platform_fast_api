@@ -99,6 +99,34 @@ class TestAuctionRouters(RequestMixin):
 
         assert response.status_code == 401
 
+    async def test_schedule_auction_returns_403_for_non_owner(
+        self, client, user_factory, auction_obj_created, schedule_auction_payload
+    ):
+        other_user = await user_factory()
+        request_auth = await self.authenticated(client, other_user.email, "Pass@123")
+
+        response = await request_auth.patch(
+            f"/auctions/{auction_obj_created.id}/schedule",
+            json=schedule_auction_payload,
+        )
+
+        assert response.status_code == 403
+        assert response.json()["error_type"] == "NotAuctionOwnerException"
+
+    async def test_cancel_auction_returns_403_for_non_owner(
+        self, client, user_factory, auction_obj_scheduled, cancel_auction_payload
+    ):
+        other_user = await user_factory()
+        request_auth = await self.authenticated(client, other_user.email, "Pass@123")
+
+        response = await request_auth.patch(
+            f"/auctions/{auction_obj_scheduled.id}/cancel",
+            json=cancel_auction_payload,
+        )
+
+        assert response.status_code == 403
+        assert response.json()["error_type"] == "NotAuctionOwnerException"
+
     async def test_schedule_nonexistent_auction_returns_404(
         self, client, user_obj, schedule_auction_payload
     ):

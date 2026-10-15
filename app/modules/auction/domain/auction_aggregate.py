@@ -19,6 +19,7 @@ from .exceptions.auction_exceptions import (
     InvalidAuctionStartTimeException,
     InvalidAuctionStatusException,
     InvalidAuctionTitleException,
+    NotAuctionOwnerException,
 )
 
 
@@ -210,6 +211,10 @@ class Auction:
                 }
             )
         )
+
+    def ensure_owned_by(self, user_id: uuid.UUID) -> None:
+        if self._user_id != user_id:
+            raise NotAuctionOwnerException(str(self.id))
 
     @staticmethod
     def _as_aware(value: datetime | None) -> datetime | None:
